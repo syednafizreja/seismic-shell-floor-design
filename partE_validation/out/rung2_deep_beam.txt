@@ -1,0 +1,8 @@
+Rung 2: deep-beam floor, E = 3.3e+10 Pa, nu = 0.2, t = 0.06 m, D = 6 m, q = 1e+04 N/m
+mid-span, mid-depth deflection; errors relative to each reference
+L/D  2  FE   0.11915 mm (coarse   0.11915)  Timoshenko   0.11939 ( -0.20 %)  shear share 36.5%
+L/D  3  FE   0.48184 mm (coarse   0.48184)  Timoshenko   0.48170 ( +0.03 %)  shear share 20.4%
+L/D  4  FE   1.38733 mm (coarse   1.38733)  Timoshenko   1.38667 ( +0.05 %)  shear share 12.6%
+L/D  6  FE   6.53127 mm (coarse   6.53126)  Timoshenko   6.52909 ( +0.03 %)  shear share  6.0%
+L/D  8  FE  20.09642 mm (coarse  20.09640)  Timoshenko  20.09212 ( +0.02 %)  shear share  3.5%
+worst error against Timoshenko, all L/D and both meshes: 0.21 %  ->  PASS (limit 2 %)
