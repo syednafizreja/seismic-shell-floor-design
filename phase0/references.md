@@ -1,0 +1,15 @@
+# P1 key references: copies on disk (checked 17 Nov 2026)
+
+| Reference | Copy / note |
+|---|---|
+| Ismail & Mueller 2021, Eng. Struct. 246, 10.1016/j.engstruct.2021.112955 | **missing**: WANTLIST |
+| Amir & Majdouba 2024, SMO 67(6), 10.1007/s00158-024-03824-9 | Papers/10.1007_s00158-024-03824-9.pdf |
+| Whiteley et al. 2023, Structures, 10.1016/j.istruc.2023.03.116 | Papers/10.1016_j.istruc.2023.03.116.pdf |
+| Oval et al. 2023, Structures, 10.1016/j.istruc.2023.01.063 | Zotero VBGC4CNG |
+| Feickert & Mueller 2023, 10.1007/s44150-023-00101-z | Zotero 4W585PD5 |
+| Chiang & Borgart 2021, Eng. Struct. 251 (online 2021), 10.1016/j.engstruct.2021.113514. Actual title: "A form-finding method for membrane shells with radial basis functions" | Papers/10.1016_j.engstruct.2021.113514.pdf. Claim checked in the abstract: "peripheral walls are preferable to allow the membrane shells to carry horizontal loads in various directions" |
+| Jewett & Carstensen 2026, arXiv:2604.22070 (title: Topology optimization for materially efficient reinforced concrete design...) | Papers/2604.22070.pdf |
+| Kotronis & Grange 2010, EJECE 14(6-7) | **unresolved**: no OpenAlex match; author to give the title/DOI |
+| Micelli et al. 2014, equivalent diaphragms | **unresolved**: as above |
+| Ranaudo 2021 (HiLo), Terazawa 2022, Wehner & Ismail 2025 | not yet looked up (Phase 0) |
+| EN 1998-1 cl. 4.3.1(4) | code text: author's copy |
