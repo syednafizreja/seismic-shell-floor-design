@@ -6,24 +6,37 @@ In-plane stiffness of one smooth concrete vault bay, set against a flat plate of
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero_dark.png">
-  <img alt="Two bar charts on the same scale, bars starting at zero. Extensional ratio to a flat plate: rise 0 is 1.00000, 3 m at rise 0.30 m is 0.48014, 3 m at rise 0.60 m is 0.44562, 6 by 3 m at rise 0.60 m is 0.82164. Shear ratio: 1.00000, 0.67173, 0.51267, 0.57224. A dashed line marks the flat plate." src="docs/img/hero_light.png">
+  <img alt="Two bar charts on the same scale, bars starting at zero. Extensional ratio to a flat 60 mm plate: flat 1.00000, smooth rise 0.30 m 0.46875, cross 0.43480, smooth rise 0.60 m 0.40763, cross 0.38984. Shear ratio: 1.00000, 0.65578, 0.60185, 0.46892, 0.45189." src="docs/img/hero_light.png">
 </picture>
 
 ## Key finding
 
-*Question:* at equal concrete volume, how much of a flat plate's in-plane stiffness does one smooth vault bay keep? Hypothesis H1 in [brief.md](brief.md) asks this of a curved, ribbed floor. This bay has no ribs.
+*Question:* at equal concrete volume, how much of a flat plate's in-plane stiffness does one vault bay keep, and does one rib cross give any of it back? Hypothesis H1 in [brief.md](brief.md).
 
-> The smooth 3 m bay at rise 0.60 m, equal volume, keeps 0.44562 of the flat extensional stiffness and 0.51267 of the flat shear stiffness (16×16, t = 54.9 mm).
+> One rib cross stays below the smooth shell. At rise 0.60 m, Et/(E T) is 0.38984 on the cross and 0.40763 on the smooth shell. The flat plate is 1.00000.
 
 | Hypothesis | Verdict | Key numbers |
 |---|---|---|
-| H1. Flat-plate in-plane stiffness is an upper bound for the curved, ribbed floor of equal volume | Open. The smooth bay is below the flat plate. Ribs are not in this bay | 0.44562 and 0.51267 at rise 0.60 m, equal volume, 16×16 |
+| H1. Flat-plate in-plane stiffness is an upper bound for the curved, ribbed floor of equal volume | Open. This cross and the smooth shell are both below the flat plate. The cross is below the smooth shell. One layout does not close H1 | Rise 0.60 m, 21×21: smooth 0.40763 and 0.46892; cross 0.38984 and 0.45189 |
 
 | Recorded | Not in this record |
 |---|---|
-| Rungs 1 and 2. One smooth sinusoidal bay, linear plan stiffness | Ribs, joints, reduced diaphragm, generator, building loop, NSGA-II |
+| Rungs 1 and 2. Smooth bay. One orthogonal rib cross | Other rib layouts, joints, reduced diaphragm, alpha, gravity checks, generator, building loop, NSGA-II |
 
-The figure uses the rise-zero row and the finest equal-volume row of each curved bay. The full mesh table is below. Both are [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt). Plotted values: [docs/img/hero.json](docs/img/hero.json).
+The figure is the equal-volume comparison, Et/(E T) and Gt/(G T), with T = 60 mm. [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt). Plotted values: [docs/img/hero.json](docs/img/hero.json).
+
+| Case | Mesh | t shell mm | t rib mm | Area/plan | Et/(E T) | Gt/(G T) | Et/(E t*) |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Smooth, rise 0 | 21×21 | 60.0 | 60.0 | 1.0000 | 1.00000 | 1.00000 | 1.00000 |
+| Cross, rise 0 | 21×21 | 50.0 | 157.6 | 1.0000 | 0.94989 | 0.89831 | |
+| Smooth, rise 0.30 m | 21×21 | 58.6 | 58.6 | 1.0243 | 0.46875 | 0.65578 | 0.48013 |
+| Cross, rise 0.30 m | 21×21 | 50.0 | 142.2 | 1.0243 | 0.43480 | 0.60185 | |
+| Smooth, rise 0.60 m | 21×21 | 54.9 | 54.9 | 1.0931 | 0.40763 | 0.46892 | 0.44560 |
+| Cross, rise 0.60 m | 21×21 | 50.0 | 102.5 | 1.0931 | 0.38984 | 0.45189 | |
+
+At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. At rise 0.30 m those ratios are 0.92757 and 0.91777. On the flat plate they are 0.94989 and 0.89831.
+
+The earlier mesh table uses another ratio. Et/(E t) there divides by the thickness in the row, not by 60 mm. For the 16×16 equal-volume row at rise 0.60 m, 0.44562 / 1.0930 = 0.40770, beside 0.40763 on the 21×21 mesh. [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt).
 
 | Case | Mesh | t mm | Area/plan | Et/(E t) | Gt/(G t) |
 |---|---|---:|---:|---:|---:|
@@ -49,13 +62,14 @@ Rise zero against the flat cell in the same file: Et 1.684e-06 %, Gt 1.155e-12 %
 | 3 m, rise 0.60 m, 12×12 to 16×16 | 0.44758 to 0.44752 | 0.52133 to 0.52114 |
 | 6×3 m, rise 0.60 m, 8×4 to 16×8 | 0.82641 to 0.82359 | 0.59070 to 0.57860 |
 
-The 6×3 m shear ratio still moves between those two meshes. The long direction of that bay is flatter than the square at the same rise, and it keeps more extensional stiffness (0.82164 at equal volume).
+The 6×3 m shear ratio still moves between those two meshes. The long direction of that bay is flatter than the square at the same rise, and its equal-volume Et/(E t) is 0.82164.
 
 | Limit | Record |
 |---|---|
 | Surface | z = f sin(π x / Lx) sin(π y / Ly). *Author to confirm the surface and the rises 0.30 m and 0.60 m.* |
-| Comparison | Et/(E t) and Gt/(G t) of a flat plate with the thickness in the row |
-| Analysis | Linear static S8R. No geometric stiffness. No ribs |
+| Ribs | One cross on the centreline. Width 3/21 m. Shell 50 mm. Rib thickness set to the 60 mm volume. *Author to confirm the cross, the width and the 50 mm shell.* |
+| Comparison | Et/(E T) and Gt/(G T), T = 60 mm. The mesh table also prints Et/(E t) of the row thickness |
+| Analysis | Linear static S8R. No geometric stiffness. No joints |
 | Area | Faceted corner triangles over the plan. The mid-side curve is not counted |
 
 ## Check it in three steps
@@ -74,6 +88,7 @@ conda activate research
 PYTHONPATH=. python partE_validation/rung1_unit_cell.py
 PYTHONPATH=. python partE_validation/rung2_deep_beam.py
 PYTHONPATH=. python partE_validation/vault_bay.py
+PYTHONPATH=. python partE_validation/vault_rib.py
 ```
 
 **3. Figure at the top**
@@ -106,18 +121,19 @@ $$
 | Boundary | Affine u and v, and w = 0, on the plan boundary only. Interior nodes are free |
 | Strain | Three states, magnitude 1×10⁻⁴. Resultants from the virtual work of the plan reactions, divided by the plan area |
 | Equal volume | t* above, so the faceted surface matches the 60 mm plate. Equal thickness is reported beside it |
+| Ribs | Orthogonal cross, one element wide, on the 21×21 mesh. Two shell sections |
 | Code | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py), `shell_membrane_stiffness` |
 
 A rise of zero uses the same grid as `membrane_stiffness` and must agree within 0.1 %. Curved rows have no pass mark. They are the record.
 
 ## Figures
 
-Drawn from `partE_validation/out/vault_bay.txt` by [scripts/readme_hero.py](scripts/readme_hero.py). The number on the figure is the file value.
+Drawn from `partE_validation/out/vault_rib.txt` by [scripts/readme_hero.py](scripts/readme_hero.py). The number on the figure is the file value.
 
 | Equal-volume stiffness | |
 |---|---|
-| <img src="docs/img/hero_light.png" alt="Extensional and shear stiffness ratios for the flat bay and three equal-volume vaults. Bars start at zero." width="720"> | |
-| Rise-zero row and the finest equal-volume row of each curved bay. Source: `partE_validation/out/vault_bay.txt`. | |
+| <img src="docs/img/hero_light.png" alt="Extensional and shear stiffness of the flat plate, the smooth bay and one rib cross, divided by a flat 60 mm plate. Bars start at zero." width="720"> | |
+| Equal-volume rows of the smooth shell and one rib cross. Source: `partE_validation/out/vault_rib.txt`. | |
 
 ## Validation
 
@@ -126,6 +142,7 @@ Drawn from `partE_validation/out/vault_bay.txt` by [scripts/readme_hero.py](scri
 | Rung 1. Flat cell against exact E t, G t | 1 % | PASS. Worst error 1.62e-06 % | [partE_validation/out/rung1_unit_cell.txt](partE_validation/out/rung1_unit_cell.txt) |
 | Rung 2. Deep beam against Timoshenko | 2 % | PASS. Worst error 0.21 %. Shear share 3.5 % to 36.5 % | [partE_validation/out/rung2_deep_beam.txt](partE_validation/out/rung2_deep_beam.txt) |
 | Rise zero against the flat cell | 0.1 % | PASS. Et 1.684e-06 %, Gt 1.155e-12 % | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
+| Smooth rise 0 on the rib mesh | exact E T | 1.00000 and 1.00000. The cross has no pass mark | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
 
 Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. ShellBench is imported, not edited.
 
@@ -135,13 +152,14 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 |---|---|
 | The question and H1 | [brief.md](brief.md) |
 | Choices still to confirm | [docs/decisions.md](docs/decisions.md) |
-| The vault-bay record | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
+| The smooth-bay mesh record | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
+| The rib cross | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
 | The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py) |
 | The figure script | [scripts/readme_hero.py](scripts/readme_hero.py) |
 
 | Folder | Brief part | State |
 |---|---|---|
-| `partA_mechanics/` | Unit cell, then the smooth bay | Solver and the bay above |
+| `partA_mechanics/` | Unit cell, smooth bay, one rib cross | Solver and the two bays above |
 | `partB_generator/` | Floor generator | Not started |
 | `partC_building/` | Whole building | Not started |
 | `partD_optimise/` | NSGA-II | Not started. The brief forbids it before the rungs pass |

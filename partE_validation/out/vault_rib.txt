@@ -1,0 +1,14 @@
+Vault bay with one orthogonal rib cross. Linear S8R. Plan-projected membrane stiffness.
+E = 3.3e+10 Pa, nu = 0.2. Equal volume to a flat plate of T = 0.06 m.
+Shell between ribs 0.05 m. Rib width 0.142857 m, one element on a 21x21 mesh. Author to confirm.
+case                         mesh    t_sh   t_rib  area/plan   Et/ET    Gt/GT   Et/(E t*)
+Et/ET and Gt/GT use T = 60 mm. Et/(E t*) is only for a uniform shell, t* = T * plan / area.
+smooth rise 0.00 equal V     21x21     60.0   60.0   1.0000  1.00000  1.00000  1.00000
+cross rise 0.00 equal V      21x21     50.0  157.6   1.0000  0.94989  0.89831        -
+  rib area 0.8367 m2, shell area 8.1633 m2, volume 0.5400 m3, Et_cross/Et_smooth 0.94989, Gt_cross/Gt_smooth 0.89831
+smooth rise 0.30 equal V     21x21     58.6   58.6   1.0243  0.46875  0.65578  0.48013
+cross rise 0.30 equal V      21x21     50.0  142.2   1.0243  0.43480  0.60185        -
+  rib area 0.8574 m2, shell area 8.3610 m2, volume 0.5400 m3, Et_cross/Et_smooth 0.92757, Gt_cross/Gt_smooth 0.91777
+smooth rise 0.60 equal V     21x21     54.9   54.9   1.0931  0.40763  0.46892  0.44560
+cross rise 0.60 equal V      21x21     50.0  102.5   1.0931  0.38984  0.45189        -
+  rib area 0.9154 m2, shell area 8.9229 m2, volume 0.5400 m3, Et_cross/Et_smooth 0.95637, Gt_cross/Gt_smooth 0.96369

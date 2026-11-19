@@ -43,12 +43,43 @@ def grid_q8(lx: float, ly: float, nx: int, ny: int):
     return np.array(xyz), np.array(els)
 
 
-def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all") -> str:
+def _shell_sections(els, t, thickness) -> list[str]:
+    """One shell section, or one section per thickness when ribs and shell differ.
+
+    A scalar thickness keeps the original single ELSET=EALL section. An array, one
+    value per element, adds an ELSET per distinct thickness. EALL still contains
+    every element, for gravity and for the node set.
+    """
+    if thickness is None:
+        return ["*SHELL SECTION, ELSET=EALL, MATERIAL=C", f"{t:.9g}"]
+    th = np.asarray(thickness, float)
+    if th.shape != (len(els),):
+        raise ValueError(f"thickness has shape {th.shape}, expected {(len(els),)}")
+    groups: dict[float, list[int]] = {}
+    order: list[float] = []
+    for k, tv in enumerate(th):
+        key = float(f"{tv:.9g}")
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(k + 1)
+    out = []
+    for i, key in enumerate(order):
+        name = "ETH0" if len(order) == 1 else f"ETH{i}"
+        ids = groups[key]
+        out.append(f"*ELSET, ELSET={name}")
+        for s in range(0, len(ids), 16):
+            out.append(", ".join(str(n) for n in ids[s:s + 16]))
+        out += [f"*SHELL SECTION, ELSET={name}, MATERIAL=C", f"{key:.9g}"]
+    return out
+
+
+def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all", thickness=None) -> str:
     out = ["*NODE"] + [f"{i + 1}, {x:.12g}, {y:.12g}, {z:.12g}" for i, (x, y, z) in enumerate(xyz)]
     out += ["*ELEMENT, TYPE=S8R, ELSET=EALL"] + [f"{k + 1}, " + ", ".join(map(str, e)) for k, e in enumerate(els)]
     out += ["*NSET, NSET=NALL, GENERATE", f"1, {len(xyz)}, 1",
-            "*MATERIAL, NAME=C", "*ELASTIC", f"{E:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}",
-            "*SHELL SECTION, ELSET=EALL, MATERIAL=C", f"{t:.9g}"]
+            "*MATERIAL, NAME=C", "*ELASTIC", f"{E:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}"]
+    out += _shell_sections(els, t, thickness)
     # A flat cell is a membrane: every node is held at z = 0. A vault holds z only on its
     # plan boundary, so the shell can move vertically between the edges.
     if lock_w == "all":
@@ -80,10 +111,10 @@ def _read_dat(path: Path, n: int):
     return U, RF
 
 
-def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None, lock_w="all"):
+def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None, lock_w="all", thickness=None):
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
-        (d / "job.inp").write_text(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav, lock_w))
+        (d / "job.inp").write_text(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav, lock_w, thickness))
         r = run_ccx("job", d, threads=2)
         if not (d / "job.dat").exists():
             raise RuntimeError("ccx failed:\n" + r.stdout[-2000:])
@@ -152,17 +183,22 @@ def grid_on_surface(lx, ly, nx, ny, z_of):
     return xyz, els
 
 
+def element_areas(xyz, els) -> np.ndarray:
+    """Faceted area of each element, from its four corner nodes. Mid-side curve is not counted."""
+    areas = np.empty(len(els))
+    for k, e in enumerate(els):
+        c = xyz[np.asarray(e[:4]) - 1]
+        areas[k] = (0.5 * np.linalg.norm(np.cross(c[1] - c[0], c[3] - c[0]))
+                    + 0.5 * np.linalg.norm(np.cross(c[2] - c[1], c[2] - c[3])))
+    return areas
+
+
 def faceted_area(xyz, els) -> float:
     """Sum of the two corner triangles of each element. The curved edge between them is not counted."""
-    area = 0.0
-    for e in els:
-        c = xyz[np.asarray(e[:4]) - 1]
-        area += 0.5 * np.linalg.norm(np.cross(c[1] - c[0], c[3] - c[0]))
-        area += 0.5 * np.linalg.norm(np.cross(c[2] - c[1], c[2] - c[3]))
-    return float(area)
+    return float(element_areas(xyz, els).sum())
 
 
-def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8):
+def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8, thickness=None):
     """Plan membrane stiffness of one sinusoidal vault bay.
 
     The same three affine plan strains as ``membrane_stiffness`` are imposed on the boundary.
@@ -182,7 +218,7 @@ def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8):
             bcs += [(i + 1, 1, exx * x + 0.5 * gxy * y),
                     (i + 1, 2, eyy * y + 0.5 * gxy * x),
                     (i + 1, 3, 0.0)]
-        _, RF = solve(xyz, els, t, E, nu, bcs, lock_w="boundary")
+        _, RF = solve(xyz, els, t, E, nu, bcs, lock_w="boundary", thickness=thickness)
         R = RF[bnd, :2]
         P = xyz[bnd, :2]
         Sxx = np.sum(R[:, 0] * P[:, 0]) / (lx * ly)

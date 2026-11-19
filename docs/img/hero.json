@@ -1,50 +1,60 @@
 {
  "sources": [
-  "partE_validation/out/vault_bay.txt"
+  "partE_validation/out/vault_rib.txt"
  ],
- "rule": "Et/(E t) and Gt/(G t) of a flat plate with the thickness in the row. Equal-volume thickness matches the faceted area to a 60 mm plate.",
+ "rule": "Et/(E T) and Gt/(G T) with T = 60 mm, the flat plate of equal faceted volume.",
  "order": [
-  "square 3 m, rise 0 8x8",
-  "3x3 m rise 0.30 equal V 16x16",
-  "3x3 m rise 0.60 equal V 16x16",
-  "6x3 m rise 0.60 equal V 16x8"
+  "smooth rise 0.00 equal V 21x21",
+  "smooth rise 0.30 equal V 21x21",
+  "cross rise 0.30 equal V 21x21",
+  "smooth rise 0.60 equal V 21x21",
+  "cross rise 0.60 equal V 21x21"
  ],
- "rise_zero_vs_flat_cell_percent": {
-  "Et_percent": "1.684e-06",
-  "Gt_percent": "1.155e-12"
- },
  "rows": [
   {
-   "case": "square 3 m, rise 0",
-   "mesh": "8x8",
-   "t_mm": "60.0",
+   "case": "smooth rise 0.00 equal V",
+   "mesh": "21x21",
+   "t_shell_mm": "60.0",
+   "t_rib_mm": "60.0",
    "area_plan": "1.0000",
    "Et": "1.00000",
    "Gt": "1.00000"
   },
   {
-   "case": "3x3 m rise 0.30 equal V",
-   "mesh": "16x16",
-   "t_mm": "58.6",
-   "area_plan": "1.0242",
-   "Et": "0.48014",
-   "Gt": "0.67173"
+   "case": "smooth rise 0.30 equal V",
+   "mesh": "21x21",
+   "t_shell_mm": "58.6",
+   "t_rib_mm": "58.6",
+   "area_plan": "1.0243",
+   "Et": "0.46875",
+   "Gt": "0.65578"
   },
   {
-   "case": "3x3 m rise 0.60 equal V",
-   "mesh": "16x16",
-   "t_mm": "54.9",
-   "area_plan": "1.0930",
-   "Et": "0.44562",
-   "Gt": "0.51267"
+   "case": "cross rise 0.30 equal V",
+   "mesh": "21x21",
+   "t_shell_mm": "50.0",
+   "t_rib_mm": "142.2",
+   "area_plan": "1.0243",
+   "Et": "0.43480",
+   "Gt": "0.60185"
   },
   {
-   "case": "6x3 m rise 0.60 equal V",
-   "mesh": "16x8",
-   "t_mm": "56.7",
-   "area_plan": "1.0583",
-   "Et": "0.82164",
-   "Gt": "0.57224"
+   "case": "smooth rise 0.60 equal V",
+   "mesh": "21x21",
+   "t_shell_mm": "54.9",
+   "t_rib_mm": "54.9",
+   "area_plan": "1.0931",
+   "Et": "0.40763",
+   "Gt": "0.46892"
+  },
+  {
+   "case": "cross rise 0.60 equal V",
+   "mesh": "21x21",
+   "t_shell_mm": "50.0",
+   "t_rib_mm": "102.5",
+   "area_plan": "1.0931",
+   "Et": "0.38984",
+   "Gt": "0.45189"
   }
  ]
 }

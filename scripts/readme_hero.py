@@ -1,9 +1,8 @@
-"""Draw the README hero from the vault-bay record.
+"""Draw the README hero from the ribbed-bay record.
 
-Two panels, same scale, bars from zero: extensional and shear stiffness of one
-smooth bay, divided by a flat plate of the same thickness. One PNG per GitHub
-theme, 1280 x 640 px. The plotted numbers are written to docs/img/hero.json.
-Nothing here changes a result.
+Two panels, same scale, bars from zero: plan stiffness divided by a flat plate
+of equal volume (T = 60 mm). One PNG per GitHub theme, 1280 x 640 px. The
+plotted numbers are written to docs/img/hero.json. Nothing here changes a result.
 
 Colours are fixed to the bay, in file order. They are not sorted by the result.
 
@@ -23,15 +22,16 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "partE_validation" / "out" / "vault_bay.txt"
+SRC = ROOT / "partE_validation" / "out" / "vault_rib.txt"
 OUT = ROOT / "docs" / "img"
 
 # Identity colours, ShellBench slot order, fixed to these bays. Never re-ordered by rank.
 WANT = [
-    ("square 3 m, rise 0", "8x8", "flat", "rise 0", "#2a78d6"),
-    ("3x3 m rise 0.30 equal V", "16x16", "3 m", "rise 0.30 m", "#eb6834"),
-    ("3x3 m rise 0.60 equal V", "16x16", "3 m", "rise 0.60 m", "#1baf7a"),
-    ("6x3 m rise 0.60 equal V", "16x8", "6×3 m", "rise 0.60 m", "#eda100"),
+    ("smooth rise 0.00 equal V", "21x21", "flat", "60 mm", "#2a78d6"),
+    ("smooth rise 0.30 equal V", "21x21", "smooth", "0.30 m", "#eb6834"),
+    ("cross rise 0.30 equal V", "21x21", "cross", "0.30 m", "#1baf7a"),
+    ("smooth rise 0.60 equal V", "21x21", "smooth", "0.60 m", "#eda100"),
+    ("cross rise 0.60 equal V", "21x21", "cross", "0.60 m", "#e87ba4"),
 ]
 
 THEMES = {
@@ -42,31 +42,28 @@ THEMES = {
 }
 
 
-def load() -> tuple[list[dict], dict[str, str]]:
-    """Equal-volume rows, plus the rise-zero row, as printed in the record."""
+def load() -> list[dict]:
+    """Equal-volume rows as printed in the rib record. Et and Gt are over E T and G T."""
     text = SRC.read_text(encoding="utf-8")
     found = {}
     for ln in text.splitlines():
         m = re.match(
-            r"^(square 3 m, rise 0|[\d.]+x[\d.]+ m rise [\d.]+ equal [tV])\s+"
-            r"(\d+x\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)",
+            r"^((?:smooth|cross) rise [\d.]+ equal V)\s+"
+            r"(\d+x\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)",
             ln,
         )
         if m:
             found[(m.group(1), m.group(2))] = {
-                "case": m.group(1), "mesh": m.group(2), "t_mm": m.group(3),
-                "area_plan": m.group(4), "Et": m.group(5), "Gt": m.group(6),
+                "case": m.group(1), "mesh": m.group(2), "t_shell_mm": m.group(3),
+                "t_rib_mm": m.group(4), "area_plan": m.group(5), "Et": m.group(6), "Gt": m.group(7),
             }
     rows = []
     for case, mesh, name, role, colour in WANT:
         row = found.get((case, mesh))
         if row is None:
-            raise SystemExit(f"vault_bay.txt has no row {case} {mesh}")
+            raise SystemExit(f"vault_rib.txt has no row {case} {mesh}")
         rows.append({**row, "name": name, "role": role, "colour": colour})
-    err = re.search(r"vs flat cell ([\deE.+-]+) % and ([\deE.+-]+) %", text)
-    if not err:
-        raise SystemExit("vault_bay.txt has no rise-zero comparison")
-    return rows, {"Et_percent": err.group(1), "Gt_percent": err.group(2)}
+    return rows
 
 
 def _fit(fig, text: str, x: float, y: float, color: str, weight: str, start: float, floor: float) -> None:
@@ -95,17 +92,18 @@ def draw(rows: list[dict], theme: str) -> Path:
     th = THEMES[theme]
     plt.rcParams.update({"font.family": fonts(), "font.size": 11, "axes.unicode_minus": False})
     fig = plt.figure(figsize=(12.8, 6.4), dpi=100, facecolor=th["bg"])
-    lead = next(r for r in rows if r["case"] == "3x3 m rise 0.60 equal V")
-    _fit(fig, f"Smooth 3 m bay, rise 0.60 m, equal volume: extensional stiffness {lead['Et']} of the flat plate.",
-         0.045, 0.955, th["ink"], "bold", 15.5, 12)
+    smooth = next(r for r in rows if r["case"] == "smooth rise 0.60 equal V")
+    cross = next(r for r in rows if r["case"] == "cross rise 0.60 equal V")
+    _fit(fig, f"One rib cross stays below the smooth bay: {cross['Et']} against {smooth['Et']}.",
+         0.045, 0.955, th["ink"], "bold", 16, 13)
     fig.text(0.045, 0.875,
-             "Plan-projected membrane stiffness.  Thickness set so the faceted surface matches a 60 mm flat plate.  No ribs.",
+             "Equal volume to a flat 60 mm plate.  Rise 0.60 m on a 3 m bay.  Shell between ribs 50 mm.",
              fontsize=11, color=th["muted"], ha="left", va="top")
 
     ymax = 1.38
     panels = [
-        (0.055, "Et", "Extensional,  Et / (E t)"),
-        (0.545, "Gt", "Shear,  Gt / (G t)"),
+        (0.055, "Et", "Extensional,  Et / (E × 60 mm)"),
+        (0.545, "Gt", "Shear,  Gt / (G × 60 mm)"),
     ]
     for x0, key, title in panels:
         ax = fig.add_axes([x0, 0.18, 0.40, 0.56], facecolor=th["bg"])
@@ -129,12 +127,12 @@ def draw(rows: list[dict], theme: str) -> Path:
             spine.set_linewidth(0.6)
         ax.set_title(title, loc="left", color=th["ink"], fontsize=12.5, fontweight="bold", pad=8)
         if x0 < 0.1:
-            ax.set_ylabel("Ratio to a flat plate of the same thickness", color=th["muted"], fontsize=10)
+            ax.set_ylabel("Ratio to a flat 60 mm plate, equal volume", color=th["muted"], fontsize=10)
         else:
             ax.set_yticklabels([])
     lines = [
-        "Bars start at zero and stay in bay order. Dashed line: the flat plate. The number is the file value.",
-        "Data: partE_validation/out/vault_bay.txt. Curved bars are the finest equal-volume mesh of that bay.",
+        "Bars start at zero and stay in file order. Dashed line: the flat 60 mm plate. The number is the file value.",
+        "Data: partE_validation/out/vault_rib.txt. One orthogonal cross. Linear, no joints.",
     ]
     for y, line in ((0.058, lines[0]), (0.026, lines[1])):
         _fit(fig, line, 0.045, y, th["faint"], "normal", 8.5, 7.5)
@@ -146,15 +144,14 @@ def draw(rows: list[dict], theme: str) -> Path:
 
 
 def main() -> None:
-    rows, err = load()
+    rows = load()
     for theme in THEMES:
         print(draw(rows, theme))
     payload = {
-        "sources": ["partE_validation/out/vault_bay.txt"],
-        "rule": "Et/(E t) and Gt/(G t) of a flat plate with the thickness in the row. Equal-volume thickness matches the faceted area to a 60 mm plate.",
+        "sources": ["partE_validation/out/vault_rib.txt"],
+        "rule": "Et/(E T) and Gt/(G T) with T = 60 mm, the flat plate of equal faceted volume.",
         "order": [r["case"] + " " + r["mesh"] for r in rows],
-        "rise_zero_vs_flat_cell_percent": err,
-        "rows": [{k: r[k] for k in ("case", "mesh", "t_mm", "area_plan", "Et", "Gt")} for r in rows],
+        "rows": [{k: r[k] for k in ("case", "mesh", "t_shell_mm", "t_rib_mm", "area_plan", "Et", "Gt")} for r in rows],
     }
     (OUT / "hero.json").write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
     from PIL import Image
