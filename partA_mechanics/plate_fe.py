@@ -1,13 +1,15 @@
 """In-plane analysis of flat floor plates with CalculiX S8R shells (Part A, mechanics core).
 
 A structured grid of 8-node quadrilaterals covers the rectangle [0, Lx] x [0, Ly] in the
-x-y plane. Out-of-plane displacement is held at zero, so the shell works as a membrane:
-the in-plane stiffness that the diaphragm check needs. Units: N, m, Pa.
+x-y plane. A flat cell holds every node at z = 0, so the shell works as a membrane.
+A vault holds z only on the plan boundary. Units: N, m, Pa.
 
-Two uses:
+Three uses:
 - ``membrane_stiffness``: unit-cell homogenisation. Three affine strain states imposed on the
   whole boundary give the membrane stiffness matrix A (N/m), from which (E t)_eq and (G t)_eq.
 - ``deep_beam``: a simply supported floor strip loaded in its own plane, for the Timoshenko check.
+- ``shell_membrane_stiffness``: the same plan strains on one sinusoidal bay. Out-of-plane
+  displacement is held only on the plan boundary.
 """
 from __future__ import annotations
 
@@ -41,13 +43,16 @@ def grid_q8(lx: float, ly: float, nx: int, ny: int):
     return np.array(xyz), np.array(els)
 
 
-def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None) -> str:
+def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all") -> str:
     out = ["*NODE"] + [f"{i + 1}, {x:.12g}, {y:.12g}, {z:.12g}" for i, (x, y, z) in enumerate(xyz)]
     out += ["*ELEMENT, TYPE=S8R, ELSET=EALL"] + [f"{k + 1}, " + ", ".join(map(str, e)) for k, e in enumerate(els)]
     out += ["*NSET, NSET=NALL, GENERATE", f"1, {len(xyz)}, 1",
             "*MATERIAL, NAME=C", "*ELASTIC", f"{E:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}",
-            "*SHELL SECTION, ELSET=EALL, MATERIAL=C", f"{t:.9g}",
-            "*BOUNDARY", "NALL, 3, 3, 0."]                  # membrane: no out-of-plane motion
+            "*SHELL SECTION, ELSET=EALL, MATERIAL=C", f"{t:.9g}"]
+    # A flat cell is a membrane: every node is held at z = 0. A vault holds z only on its
+    # plan boundary, so the shell can move vertically between the edges.
+    if lock_w == "all":
+        out += ["*BOUNDARY", "NALL, 3, 3, 0."]
     out += ["*STEP", "*STATIC", "*BOUNDARY"] + [f"{n}, {d}, {d}, {v:.12g}" for n, d, v in bcs]
     if loads:
         out += ["*CLOAD"] + [f"{n}, {d}, {v:.12g}" for n, d, v in loads]
@@ -75,10 +80,10 @@ def _read_dat(path: Path, n: int):
     return U, RF
 
 
-def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None):
+def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None, lock_w="all"):
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
-        (d / "job.inp").write_text(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav))
+        (d / "job.inp").write_text(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav, lock_w))
         r = run_ccx("job", d, threads=2)
         if not (d / "job.dat").exists():
             raise RuntimeError("ccx failed:\n" + r.stdout[-2000:])
@@ -129,3 +134,59 @@ def deep_beam(L, D, t, E, nu, q, nx=40, ny=12):
     U, _ = solve(xyz, els, t, E, nu, bcs, rho=rho, grav=-g)
     mid = int(np.argmin(np.hypot(xyz[:, 0] - L / 2, xyz[:, 1] - D / 2)))
     return -U[mid, 1]
+
+
+def sinusoid_bay(lx, ly, rise):
+    """z = rise * sin(pi x / lx) * sin(pi y / ly). The boundary lies in the plan, z = 0."""
+    def z(x, y):
+        return rise * np.sin(np.pi * x / lx) * np.sin(np.pi * y / ly)
+    return z
+
+
+def grid_on_surface(lx, ly, nx, ny, z_of):
+    """The rung-1 S8R grid, with each node lifted to z_of(x, y). Mid-side nodes follow the surface."""
+    xyz, els = grid_q8(lx, ly, nx, ny)
+    xyz = xyz.copy()
+    for i, (x, y, _) in enumerate(xyz):
+        xyz[i, 2] = float(z_of(x, y))
+    return xyz, els
+
+
+def faceted_area(xyz, els) -> float:
+    """Sum of the two corner triangles of each element. The curved edge between them is not counted."""
+    area = 0.0
+    for e in els:
+        c = xyz[np.asarray(e[:4]) - 1]
+        area += 0.5 * np.linalg.norm(np.cross(c[1] - c[0], c[3] - c[0]))
+        area += 0.5 * np.linalg.norm(np.cross(c[2] - c[1], c[2] - c[3]))
+    return float(area)
+
+
+def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8):
+    """Plan membrane stiffness of one sinusoidal vault bay.
+
+    The same three affine plan strains as ``membrane_stiffness`` are imposed on the boundary.
+    Boundary nodes are also held at z = 0. Interior nodes are free, including vertically.
+    The resultants are the plan-projected reactions, so A is the flat-diaphragm substitute of
+    the bay (N/m), not the surface stress. Linear static, no geometric stiffness.
+    """
+    xyz, els = grid_on_surface(lx, ly, nx, ny, sinusoid_bay(lx, ly, rise))
+    tol = 1e-9 * max(lx, ly)
+    bnd = [i for i, (x, y, _) in enumerate(xyz) if min(x, y, lx - x, ly - y) < tol]
+    A = np.zeros((3, 3))
+    for k, e in enumerate(np.eye(3) * 1e-4):
+        exx, eyy, gxy = e
+        bcs = []
+        for i in bnd:
+            x, y, _ = xyz[i]
+            bcs += [(i + 1, 1, exx * x + 0.5 * gxy * y),
+                    (i + 1, 2, eyy * y + 0.5 * gxy * x),
+                    (i + 1, 3, 0.0)]
+        _, RF = solve(xyz, els, t, E, nu, bcs, lock_w="boundary")
+        R = RF[bnd, :2]
+        P = xyz[bnd, :2]
+        Sxx = np.sum(R[:, 0] * P[:, 0]) / (lx * ly)
+        Syy = np.sum(R[:, 1] * P[:, 1]) / (lx * ly)
+        Sxy = np.sum(R[:, 0] * P[:, 1] + R[:, 1] * P[:, 0]) / (2 * lx * ly)
+        A[:, k] = np.array([Sxx, Syy, Sxy]) / e[k]
+    return A, faceted_area(xyz, els)

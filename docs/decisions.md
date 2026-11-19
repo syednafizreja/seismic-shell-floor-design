@@ -1,0 +1,8 @@
+# Methods log
+
+Choices made while Part A is still short of the brief, and what was checked.
+
+| Choice | Where | What was done | Result |
+|---|---|---|---|
+| First vault bay | `partA_mechanics/plate_fe.py`, `partE_validation/vault_bay.py` | The flat cell in rung 1 is the patch test. The next cell is one smooth bay, z = f sin(pi x/Lx) sin(pi y/Ly), on the same S8R grid lifted onto that surface. Gmsh is not used: this bay has no trimmed ribs. Boundary nodes take the affine plan strain and z = 0. Interior nodes are free. The stiffness is the plan-projected membrane stiffness, linear, without geometric stiffness. *Author to confirm the surface and the rises 0.30 m and 0.60 m.* | Rise zero matches the flat cell: Et 1.684e-06 %, Gt 1.155e-12 % (limit 0.1 %). Equal volume, 3 m, 16×16: rise 0.30 m, t 58.6 mm, Et/(E t) 0.48014, Gt/(G t) 0.67173; rise 0.60 m, t 54.9 mm, area/plan 1.0930, 0.44562 and 0.51267. Equal volume, 6×3 m, rise 0.60 m, 16×8, t 56.7 mm: 0.82164 and 0.57224. Equal thickness at rise 0.60 m moves from 0.44758 and 0.52133 on 12×12 to 0.44752 and 0.52114 on 16×16. The 6×3 m shear ratio moves from 0.59070 on 8×4 to 0.57860 on 16×8. Rung 1 was re-run after the solver edit: worst error still 1.62e-06 %, PASS. Rung 2 was re-run the same day: worst error still 0.21 %, PASS. H1 is not closed: this bay has no ribs. |
+| Landing page | `README.md`, `scripts/readme_hero.py` | Light and dark heroes, 1280×640, drawn from the rise-zero row and the finest equal-volume row of each curved bay. Bars start at zero. Colours stay in bay order. | The page states the smooth-bay ratios and leaves H1 open. Parts B–D are marked not started. The personal site is unchanged, and this private repository is not linked from it. |

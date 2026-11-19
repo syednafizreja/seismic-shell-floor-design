@@ -1,0 +1,20 @@
+Vault bay, sinusoidal, linear S8R. Plan-projected membrane stiffness.
+E = 3.3e+10 Pa, nu = 0.2, reference thickness 0.06 m.
+rise 0 must match membrane_stiffness on the same plan (limit 0.1 %).
+case                         mesh   t[mm]  area/plan   Et/Et_flat   Gt/Gt_flat
+square 3 m, rise 0            8x8    60.0    1.0000    1.00000     1.00000    vs flat cell 1.684e-06 % and 1.155e-12 %
+3x3 m rise 0.30 equal t  8x8   60.0    1.0240    0.48155     0.67712
+3x3 m rise 0.30 equal t  16x16  60.0    1.0242    0.48132     0.67614
+3x3 m rise 0.30 equal V  16x16  58.6    1.0242    0.48014     0.67173
+3x3 m rise 0.60 equal t  4x4   60.0    1.0886    0.45713     0.57026
+3x3 m rise 0.60 equal t  8x8   60.0    1.0921    0.44789     0.52279
+3x3 m rise 0.60 equal V  8x8   54.9    1.0921    0.44602     0.51455
+3x3 m rise 0.60 equal t  12x12  60.0    1.0928    0.44758     0.52133
+3x3 m rise 0.60 equal t  16x16  60.0    1.0930    0.44752     0.52114
+3x3 m rise 0.60 equal V  16x16  54.9    1.0930    0.44562     0.51267
+6x3 m rise 0.60 equal t  8x4   60.0    1.0565    0.82641     0.59070
+6x3 m rise 0.60 equal t  16x8   60.0    1.0583    0.82359     0.57860
+6x3 m rise 0.60 equal V  16x8   56.7    1.0583    0.82164     0.57224
+Et_flat = E t and Gt_flat = G t of a flat plate with the thickness in the row.
+area/plan is the faceted corner area of the mesh over the plan area.
+PASS

@@ -1,0 +1,50 @@
+{
+ "sources": [
+  "partE_validation/out/vault_bay.txt"
+ ],
+ "rule": "Et/(E t) and Gt/(G t) of a flat plate with the thickness in the row. Equal-volume thickness matches the faceted area to a 60 mm plate.",
+ "order": [
+  "square 3 m, rise 0 8x8",
+  "3x3 m rise 0.30 equal V 16x16",
+  "3x3 m rise 0.60 equal V 16x16",
+  "6x3 m rise 0.60 equal V 16x8"
+ ],
+ "rise_zero_vs_flat_cell_percent": {
+  "Et_percent": "1.684e-06",
+  "Gt_percent": "1.155e-12"
+ },
+ "rows": [
+  {
+   "case": "square 3 m, rise 0",
+   "mesh": "8x8",
+   "t_mm": "60.0",
+   "area_plan": "1.0000",
+   "Et": "1.00000",
+   "Gt": "1.00000"
+  },
+  {
+   "case": "3x3 m rise 0.30 equal V",
+   "mesh": "16x16",
+   "t_mm": "58.6",
+   "area_plan": "1.0242",
+   "Et": "0.48014",
+   "Gt": "0.67173"
+  },
+  {
+   "case": "3x3 m rise 0.60 equal V",
+   "mesh": "16x16",
+   "t_mm": "54.9",
+   "area_plan": "1.0930",
+   "Et": "0.44562",
+   "Gt": "0.51267"
+  },
+  {
+   "case": "6x3 m rise 0.60 equal V",
+   "mesh": "16x8",
+   "t_mm": "56.7",
+   "area_plan": "1.0583",
+   "Et": "0.82164",
+   "Gt": "0.57224"
+  }
+ ]
+}
