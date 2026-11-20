@@ -177,7 +177,7 @@ python scripts/readme_hero.py
 python scripts/alpha_fig.py
 ```
 
-Outputs: `partE_validation/out/`. The hero numbers: `docs/img/hero.json`.
+Those two scripts write `docs/img/hero_light.png`, `docs/img/hero_dark.png`, `docs/img/hero.json`, `docs/img/alpha_light.png` and `docs/img/alpha_dark.png`. Running them replaces those files. The copies in this repository are the record.
 
 ## Method
 
