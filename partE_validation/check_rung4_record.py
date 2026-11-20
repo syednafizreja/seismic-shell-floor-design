@@ -2,8 +2,9 @@
 
 Reads rung 1, rung 2, the rung-4 files, the w-lock print and the X-strut
 file. The 1 m panel stays with its printed error and the 0.5 m panel stays
-with its own. The seven layout errors stay in the file order. Does not call
-CalculiX and does not write them.
+with its own. The seven layout errors stay in the file order. A PASS mark has to sit
+inside the printed 5 % limit, and only the rise 0.30 m cross has one.
+Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -267,6 +268,29 @@ def main():
         ):
             if phrase not in decisions:
                 problems.append(f"decisions no longer keeps '{phrase}'")
+        verdict = re.compile(r"([+-]\d+\.\d+)\s+%\s+(PASS|FAIL)\s*$")
+        for name in ("rung4_layouts.txt", "rung4_cross.txt"):
+            passed = []
+            for line in (OUT / name).read_text(encoding="utf-8").splitlines():
+                match = verdict.search(line)
+                if not match:
+                    continue
+                expect = "PASS" if abs(float(match.group(1))) <= 5.0 else "FAIL"
+                if match.group(2) != expect:
+                    problems.append(f"{name} marks {match.group(1)} % as {match.group(2)}")
+                if match.group(2) == "PASS":
+                    passed.append(line)
+            if name == "rung4_layouts.txt":
+                if len(passed) != 1 or "cross rise 0.30" not in passed[0] or "1.29" not in passed[0]:
+                    problems.append("the 5 % pass is no longer the rise 0.30 m cross")
+            elif passed:
+                problems.append(f"{name} has a pass inside the recorded fails")
+        if "Six of these seven are outside 5 %" not in readme:
+            problems.append("README no longer says six of the seven layouts are outside 5 %")
+        if "Only the rise 0.30 m cross is inside 5 %" not in preprint:
+            problems.append("preprint no longer keeps the pass on the rise 0.30 m cross")
+        if "The other six are outside 5 %" not in decisions:
+            problems.append("decisions no longer says the other six are outside 5 %")
     problems.extend(check_rung2())
     problems.extend(check_rung1())
     problems.extend(check_hero())
