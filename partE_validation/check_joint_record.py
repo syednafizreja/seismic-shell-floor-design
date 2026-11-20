@@ -4,7 +4,7 @@ Reads partE_validation/out/joint_stiffness.txt, README.md, docs/preprint_v1.md
 and docs/decisions.md. Et/cont and Gt/cont are the same row divided by the
 factor-1 row. The print keeps five decimals, so that quotient can differ from
 the printed continuous ratio by a few hundredths of a thousandth. The flat
-factor-0.1 ratio stays with its strip width. The methods log names the vault
+factor-0.1 Et/cont and Gt/cont stay with the strip width. The methods log names the vault
 factor-0.1 Et/(E T), Et/cont, Gt/(G T) and Gt/cont. The methods log
 names each equal-volume vault thickness beside its mesh. Does not call CalculiX,
 does not write the file, and does not read the floor page.
@@ -67,6 +67,7 @@ def main():
 
     flat_tokens = []
     flat_pairs = []
+    flat_shear = []
     vault_tokens = []
     vault_low = []
     for (case, mesh), rows in groups.items():
@@ -96,6 +97,7 @@ def main():
         if case.startswith("flat"):
             flat_tokens.append(low["etcont_s"])
             flat_pairs.append((low["etcont_s"], low["width_s"]))
+            flat_shear.append((low["gtcont_s"], low["width_s"]))
         else:
             vault_tokens.append(base["et60_s"])
             vault_low.append((
@@ -148,6 +150,22 @@ def main():
                     window = body[start:later] if later > start else body[start:start + 90]
                     if start < 0 or shown not in window:
                         problems.append(f"{name} splits {shown} m from flat factor-0.1 Et/cont {token}")
+        if len(flat_shear) == 2:
+            for token, width in flat_shear:
+                shown = f"{float(width):.3f}"
+                other = next(item[0] for item in flat_shear if item[0] != token)
+                hits = [
+                    line for line in readme.splitlines()
+                    if line.startswith("|") and token in line
+                ]
+                if len(hits) != 1 or shown not in hits[0]:
+                    problems.append(f"README splits {shown} m from flat factor-0.1 Gt/cont {token}")
+                for name, body in (("preprint", preprint), ("decisions", decisions)):
+                    start = body.find(token)
+                    later = body.find(other, start + len(token)) if start >= 0 else -1
+                    window = body[start:later] if later > start else body[start:start + 90]
+                    if start < 0 or shown not in window:
+                        problems.append(f"{name} splits {shown} m from flat factor-0.1 Gt/cont {token}")
 
     if problems:
         print("\n".join(problems))
