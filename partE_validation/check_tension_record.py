@@ -2,7 +2,8 @@
 
 Reads the compression prints, README.md, the preprint and the methods log.
 The smooth rise 0.60 m print has no farthest-centroid line: those elements
-stay at the four corners. Does not call CalculiX and does not write the prints.
+stay at the four corners. Each largest principal has to stay in that layout's
+sentences. Does not call CalculiX and does not write the prints.
 """
 from __future__ import annotations
 
@@ -19,6 +20,55 @@ COUNT = re.compile(r"With a tensile principal (\d+)\.")
 LARGE = re.compile(r"Largest principal ([0-9.]+)e[+-]\d+")
 SMALL = re.compile(r"Smallest principal -([0-9.]+)e[+-]\d+")
 FAR = re.compile(r"Farthest tensile centroid from a plan corner (\d+\.\d+) m")
+SPANS = (
+    ("24 of 441 elements", "32 of 441 elements", ("6.950346",)),
+    ("32 of 441 elements", "On the cross", ("9.369478",)),
+    (
+        "32 at rise 0.30 m and 24 at rise 0.60 m",
+        "On the diagonals",
+        ("1.031277", "7.047014"),
+    ),
+    ("24 at both rises", "On the stress lines", ("5.770915", "5.506480")),
+)
+STRESS = ("1.020770", "6.630235", "6.193632")
+OWNED = tuple(item for _, _, group in SPANS for item in group) + STRESS
+
+
+def find_phrase(body, phrase, start=0):
+    match = re.search(r"(?<!\d)" + re.escape(phrase), body[start:])
+    return start + match.start() if match else -1
+
+
+def layout_order(body, label, problems):
+    for start, end, mantissas in SPANS:
+        begin = find_phrase(body, start)
+        finish = find_phrase(body, end, begin + len(start)) if begin >= 0 else -1
+        if begin < 0 or finish < 0:
+            problems.append(f"{label} has no span from '{start}' to '{end}'")
+            continue
+        chunk = body[begin:finish]
+        positions = [chunk.find(mantissa) for mantissa in mantissas]
+        if any(position < 0 for position in positions) or positions != sorted(positions):
+            problems.append(f"{label} does not keep {' '.join(mantissas)} with '{start}'")
+        for mantissa in OWNED:
+            if mantissa not in mantissas and mantissa in chunk:
+                problems.append(f"{label} puts {mantissa} in the '{start}' span")
+    begin = find_phrase(body, "On the stress lines")
+    cursor = begin
+    positions = []
+    for mantissa in STRESS:
+        found = body.find(mantissa, cursor) if cursor >= 0 else -1
+        positions.append(found)
+        cursor = found + len(mantissa) if found >= 0 else cursor
+    if begin < 0 or any(position < 0 for position in positions) or not (
+        begin < positions[0] < positions[1] < positions[2]
+    ):
+        problems.append(f"{label} does not keep the stress-line principals in spacing order")
+        return
+    chunk = body[begin:positions[-1]]
+    for mantissa in OWNED:
+        if mantissa not in STRESS and mantissa in chunk:
+            problems.append(f"{label} puts {mantissa} in the stress-line span")
 
 
 def main():
@@ -67,6 +117,8 @@ def main():
             problems.append(f"{path.name} has no farthest centroid")
     if not saw_corners:
         problems.append("compression_smooth.txt no longer keeps the tensile elements at the four corners")
+    layout_order(readme, "README", problems)
+    layout_order(preprint, "preprint", problems)
     if problems:
         print("\n".join(problems))
         return 1
