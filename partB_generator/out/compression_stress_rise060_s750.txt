@@ -1,0 +1,14 @@
+Rise 0.60 m, spacing 0.75 m. The recorded stress lines. This file does not replace the other counts.
+Shell-local membrane under self-weight. Positive principal stress is tension.
+Average of the two faces. Shell 50 mm. Same volume as a 60 mm flat plate.
+Print suffix _shell_0000000001. Rib elements 128. Rib thickness 66.65 mm. area/plan 1.0931.
+Crown element 221, faces -1.962041e+04 Pa and -1.705144e+04 Pa.
+Elements 441. With a tensile principal 24.
+With both principals tensile 0.
+Of the tensile elements, 20 lie within one element pitch of the plan boundary.
+Further than one element pitch from the plan boundary: x 0.2143 m, y 0.2143 m, 3.461738e+03 Pa; x 0.2143 m, y 2.7857 m, 3.461738e+03 Pa; x 2.7857 m, y 0.2143 m, 3.461738e+03 Pa; x 2.7857 m, y 2.7857 m, 3.461738e+03 Pa.
+Largest principal 6.193632e+03 Pa at x 0.0714 m, y 0.0714 m.
+Farthest tensile centroid from a plan corner 0.3642 m.
+Smallest principal -6.616185e+04 Pa.
+Author to confirm that a positive principal membrane stress is the tension check.
+No code limit is applied. The crown faces match the recorded file and are compression.
