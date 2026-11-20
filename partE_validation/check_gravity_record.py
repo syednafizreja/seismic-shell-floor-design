@@ -12,7 +12,9 @@ Gravity prints a thickness to hundredths. vault_rib.txt prints the same
 thickness to tenths. Both stay as printed. The gravity print states
 rho = 2500 kg/m3 and g = 9.81 m/s2. The methods log names the four
 eigenvalues on the flat plate, the smooth rise 0.60 m bay and the cross,
-in printed order.
+in printed order. It also names the four eigenvalues of the rise 0.30 m
+smooth shell and cross, both diagonal layouts, and the three stress-line
+layouts.
 """
 from __future__ import annotations
 
@@ -234,6 +236,22 @@ def main():
                     problems.append(f"decisions does not keep the {label} eigenvalues in order")
                     break
                 cursor = found + len(factor)
+    more = (
+        (low, ("smooth rise 0.30 m", "cross rise 0.30 m")),
+        (diag_low, ("diagonals rise 0.30 m",)),
+        (diag, ("diagonals rise 0.60 m",)),
+        (stress_low, ("stress lines rise 0.30 m",)),
+        (stress, ("stress lines 0.375 m",)),
+        (stress_wide, ("stress lines 0.75 m",)),
+    )
+    for text, tags in more:
+        found = SPECTRUM.findall(text)
+        if len(found) != len(tags):
+            problems.append(f"{tags[0]} file has {len(found)} eigenvalue lists, record has {len(tags)}")
+            continue
+        for tag, raw in zip(tags, found):
+            if f"{tag} {raw}" not in decisions:
+                problems.append(f"decisions has no eigenvalues for {tag}")
     both = (("README", readme), ("preprint", preprint))
     three = both + (("decisions", decisions),)
     for label, parsed, faces_in_decisions, stiff_text in records:
