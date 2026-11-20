@@ -1,8 +1,9 @@
 """The mesh-table numbers must match vault_bay.txt, including the 60 mm conversion.
 
 The 16×16 equal-volume row at rise 0.60 m prints Et/(E t). Dividing by
-area/plan converts it to Et/(E T) for the flat 60 mm plate. Does not call
-CalculiX, does not write the file, and does not read the floor page.
+area/plan converts it to Et/(E T) for the flat 60 mm plate. Each of the
+thirteen README rows keeps its thickness, area/plan, Et and Gt together.
+Does not call CalculiX, does not write the file, and does not read the floor page.
 """
 from __future__ import annotations
 
@@ -32,6 +33,18 @@ def require(token, docs, label, problems):
     for name, text in docs:
         if token not in text:
             problems.append(f"{label}: {name} has no {token}")
+
+
+def has_token(token, line):
+    return re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", line) is not None
+
+
+def case_label(case):
+    if case == "square 3 m, rise 0":
+        return "Square 3 m, rise 0"
+    kind = "equal V" if case.endswith("V") else "equal t"
+    plan, _, rise = case.rsplit(" ", 2)[0].partition(" rise ")
+    return f"{plan.replace('x', '×')}, rise {rise} m, {kind}"
 
 
 def main():
@@ -65,6 +78,16 @@ def main():
     for row in rows.values():
         for token in row.values():
             require(token, (("README", readme),), "mesh row", problems)
+    for (case, mesh), row in rows.items():
+        label = case_label(case)
+        mesh_label = mesh.replace("x", "×")
+        hits = [
+            line for line in readme.splitlines()
+            if line.startswith("|") and label in line and mesh_label in line
+            and all(has_token(row[key], line) for key in ("t", "area", "et", "gt"))
+        ]
+        if len(hits) != 1:
+            problems.append(f"README has {len(hits)} rows for {label} {mesh_label}")
     if err:
         require(err.group(1), (("README", readme), ("decisions", decisions)), "rise zero", problems)
         require(err.group(2), (("README", readme), ("decisions", decisions)), "rise zero", problems)
