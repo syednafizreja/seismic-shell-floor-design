@@ -8,3 +8,5 @@ spooles.out
 results/*/
 verify/out/*.tmp
 *.egg-info/
+partB_generator/out/*.log
+partE_validation/out/*.log

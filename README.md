@@ -160,6 +160,8 @@ PYTHONPATH=. python partE_validation/alpha_star.py
 
 `alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above.
 
+`rung4_layouts.py` reads `partB_generator/out/smooth_gravity_stress.dat` and `smooth_gravity_stress_030.dat` for the stress-line rows. Those files are the gravity prints. The script does not rewrite them.
+
 **3. Figures**
 
 ```bash
