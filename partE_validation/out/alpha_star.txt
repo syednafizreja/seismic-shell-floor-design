@@ -1,0 +1,30 @@
+alpha = K_d / K_f. K_d from the simply-supported Timoshenko bay. K_f from one anchor frame.
+EN 1998-1 4.3.1(4) NOTE: excess of the flexible displacement over the rigid one, limit 10%.
+Author's copy, BS EN 1998-1:2004, PDF page 55, printed page 53. Author to confirm.
+beam element against the closed deflection: -0.003 %
+two-frame alpha* 19.9956 (excess 0.1000); the definition gives 20
+K_f ground storey h=4.55 m, beam I factor 2.0: 1.174970e+08 N/m
+K_f same storey, beam I factor 1.5: 1.081711e+08 N/m
+K_f upper storey h=3.6 m, beam I factor 2.0: 2.218626e+08 N/m
+The alpha* rows use the ground storey and beam I factor 2.0 on every frame line.
+layout                         L/D    alpha*
+anchor bays                   0.314    63.052
+bays x 0.5                    0.157    39.726
+bays x 2                      0.629   145.749
+anchor, edge frames softer    0.314    53.020
+seven equal bays
+equal                         0.300    54.651
+equal                         0.500    97.479
+equal                         1.000   247.188
+equal                         2.000   495.420
+recorded cells on the anchor bays, uncracked Et and Gt, K_f of the ground storey
+case                    Et/ET    Gt/GT     alpha   excess   cracked alpha  cracked excess
+smooth rise 0           1.00000  1.00000    142.82   0.0509     71.41   0.0908
+cross rise 0            0.94989  0.89831    128.58   0.0545     64.29   0.0965
+smooth 0.30             0.46875  0.65578     92.15   0.0854     46.07   0.1417
+cross 0.30              0.43480  0.60185     84.62   0.0908     42.31   0.1494
+smooth 0.60             0.40763  0.46892     66.56   0.1012     33.28   0.1648
+cross 0.60              0.38984  0.45189     64.12   0.1045     32.06   0.1692
+Cracked rows use 0.5 Et and 0.5 Gt (4.3.1(7)) and the same K_f. Author to confirm the half.
+Depth is 21.0 m, the three transverse spans. A 3 m cell is used only through Et and Gt.
+H2 is about whether alpha* above is one number. The two-frame value 20 is not that test.

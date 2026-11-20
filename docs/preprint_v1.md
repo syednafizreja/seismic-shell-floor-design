@@ -1,0 +1,73 @@
+# One vault bay: in-plane stiffness, a diaphragm ratio, and gravity
+
+Syed Nafiz Reja Hasib. ORCID 0009-0002-7162-7890. November 2026.
+
+This is preprint v1 of the floor study. It records Part A as far as one bay, the reduced diaphragm, a joint strip, and gravity on that bay. There is no whole-building carbon result, and the search over geometries has not been run. The brief forbids that search until the validation rungs pass. There is no DOI.
+
+## Question
+
+A lighter floor cuts seismic mass, and it also cuts in-plane stiffness. The open question is where a vault bay stops acting as a rigid diaphragm. Hypothesis H1 says the flat plate is an upper bound on the in-plane stiffness of a curved ribbed floor of equal volume. Hypothesis H2 says the pass and the fail under EN 1998-1 4.3.1(4) fall on one diaphragm-to-frame ratio, alpha*, for every aspect ratio.
+
+## What was calculated
+
+The bay is 3 m square. The surface is z = f sin(π x / Lx) sin(π y / Ly), with rises 0.30 m and 0.60 m. The concrete in the floor cell is C30/37, E = 33 GPa and ν = 0.2. The mesh is a grid of CalculiX S8R shells. Equal volume means the faceted shell matches a flat plate 60 mm thick. One rib cross is a single element wide, 3/21 m, on a 50 mm shell, with the rib thickness set to that volume. The surface, the rises, the cross, the width and the 50 mm shell are still to be confirmed.
+
+Stiffness is the plan membrane stiffness under three affine strains. Linear static, with no geometric stiffness. Et/(E T) divides by the 60 mm plate.
+
+| Case | Et/(E T) | Gt/(G T) |
+|---|---:|---:|
+| Flat plate | 1.00000 | 1.00000 |
+| Smooth, rise 0.30 m | 0.46875 | 0.65578 |
+| Cross, rise 0.30 m | 0.43480 | 0.60185 |
+| Smooth, rise 0.60 m | 0.40763 | 0.46892 |
+| Cross, rise 0.60 m | 0.38984 | 0.45189 |
+
+Source: `partE_validation/out/vault_rib.txt`, mesh 21×21. At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. H1 stays open. One cross is not the ribbed floor.
+
+The diaphragm ratio is alpha = K_d / K_f. K_d is the simply-supported Timoshenko stiffness of one bay, with the cell Et and Gt, and k = 5/6 as in the deep-beam check. K_f is the ground-storey stiffness of one anchor transverse frame: 1.174970×10⁸ N/m, height 4.55 m, beam inertia factor 2.0, C40 with E = 32.5 GPa and 600 mm columns, taken from the ShellBench anchor and not re-derived here. The author confirms the storey.
+
+The floor model is that beam on a lateral spring at each frame line. The anchor spans are 6.0, 6.6, 6.6, 6.6, 6.6 and 6.0 m, and the depth is 21.0 m. A 3 m cell enters only through Et and Gt. The author confirms that step.
+
+The pass test is the NOTE to EN 1998-1 4.3.1(4), read in the author's copy of BS EN 1998-1:2004, PDF page 55, printed page 53. The flexible displacement may exceed the rigid-diaphragm displacement by at most 10% of the absolute rigid displacement. The author confirms that sentence. Half of Et and Gt is reported beside the uncracked values, from 4.3.1(7), with K_f left as it is. The author confirms the half.
+
+| Layout | L/D | alpha* |
+|---|---:|---:|
+| Seven equal bays | 0.300 | 54.651 |
+| Seven equal bays | 0.500 | 97.479 |
+| Seven equal bays | 1.000 | 247.188 |
+| Seven equal bays | 2.000 | 495.420 |
+| Anchor bays | 0.314 | 63.052 |
+
+Two frames, and the definition of K_d, give 20. The beam element returns 19.9956. H2 is not supported on this model: alpha* moves with the aspect ratio. Source: `partE_validation/out/alpha_star.txt`.
+
+On the anchor bays, uncracked, the displacement excess is 0.0509 for the flat plate, 0.1012 for the smooth rise of 0.60 m, and 0.1045 for the cross at that rise. With Et and Gt halved, those three become 0.0908, 0.1648 and 0.1692.
+
+Gravity uses the same 21×21 mesh. Boundary translations are fixed and rotations are free. Density 2500 kg/m³. The author confirms the support and the density. No imperfection knockdown is applied.
+
+| Case | Crown w, mm | Lowest positive factor on self-weight | Crown sxx, Pa |
+|---|---:|---:|---|
+| Flat, 60 mm | −0.7956 | 25122.1 | +5.701984×10⁵ and −5.701984×10⁵ |
+| Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
+| Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
+
+The flat crown bends. The vault crown is in compression on both faces. The cross does not lift the buckling factor by much, and it does not cut the crown deflection. Source: `partE_validation/out/gravity_bay.txt`.
+
+A joint is a centreline strip whose modulus is the factor times E. Factor 1 is the continuous floor. At factor 0.1 the flat plate keeps 0.58615 of its extensional stiffness on a strip 0.333 m wide, and 0.68666 on a strip 0.200 m wide. The width is the element width. The author confirms the strip. Source: `partE_validation/out/joint_stiffness.txt`.
+
+## Checks
+
+| Check | Result |
+|---|---|
+| Rung 1, flat cell | PASS. Worst error 1.62×10⁻⁶ %, limit 1 % |
+| Rung 2, deep beam | PASS. Worst error 0.21 %, limit 2 % |
+| Rise zero on the smooth bay | PASS. Et 1.684×10⁻⁶ %, Gt 1.155×10⁻¹² %, limit 0.1 % |
+| Rung 4, 3 m deep beam against its own Et, Gt | Flat −2.93 %, inside 5 %. Rise 0.60 m +15.80 %, outside 5 % |
+| X-strut grid, calibrated on Et and Gt, checked on the deep beam | 1 m panel +9.83 %. 0.5 m panel +12.74 %. Both outside 5 % |
+
+The 5 % figure is the brief's rung-4 limit. It is not a code clause. The Timoshenko reduction passes for the flat plate and does not pass for this vault. The X-strut does not pass for the flat plate either, and a finer panel does not close the gap.
+
+## What this version does not show
+
+There is no optimum shape and no saving in whole-building carbon. The generator, the frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross and one joint strip are not a segmented floor.
+
+The analysis code was written with AI assistance and reviewed by the author, as the CV already states.

@@ -1,6 +1,6 @@
 # Seismic shell floors
 
-In-plane stiffness of one smooth concrete vault bay, set against a flat plate of equal volume. Ribs, the building model, and the search are not in this record.
+In-plane stiffness of one vault bay, the diaphragm ratio of that stiffness on the anchor frame, and gravity on the same bay. The generator, the building loop and the search are not in this record.
 
 [Key finding](#key-finding) | [Check it](#check-it-in-three-steps) | [Method](#method) | [Figures](#figures) | [Validation](#validation) | [Brief](brief.md) | [Cite](#citation)
 
@@ -21,7 +21,7 @@ In-plane stiffness of one smooth concrete vault bay, set against a flat plate of
 
 | Recorded | Not in this record |
 |---|---|
-| Rungs 1 and 2. Smooth bay. One orthogonal rib cross | Other rib layouts, joints, reduced diaphragm, alpha, gravity checks, generator, building loop, NSGA-II |
+| Rungs 1 and 2. Smooth bay. One rib cross. A joint strip. Timoshenko K_d. alpha* on the anchor frame. Gravity on the 3 m bay | Other rib layouts, the X-strut within 5 %, generator, building loop, NSGA-II |
 
 The figure is the equal-volume comparison, Et/(E T) and Gt/(G T), with T = 60 mm. [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt). Plotted values: [docs/img/hero.json](docs/img/hero.json).
 
@@ -69,8 +69,44 @@ The 6×3 m shear ratio still moves between those two meshes. The long direction 
 | Surface | z = f sin(π x / Lx) sin(π y / Ly). *Author to confirm the surface and the rises 0.30 m and 0.60 m.* |
 | Ribs | One cross on the centreline. Width 3/21 m. Shell 50 mm. Rib thickness set to the 60 mm volume. *Author to confirm the cross, the width and the 50 mm shell.* |
 | Comparison | Et/(E T) and Gt/(G T), T = 60 mm. The mesh table also prints Et/(E t) of the row thickness |
-| Analysis | Linear static S8R. No geometric stiffness. No joints |
+| Analysis | Linear static S8R for the cell. Gravity adds self-weight and a linear buckling factor. No imperfection knockdown |
 | Area | Faceted corner triangles over the plan. The mid-side curve is not counted |
+
+> H2 is not supported on this model. alpha* of seven equal bays is 54.651 at L/D 0.3 and 495.420 at L/D 2. On the anchor bays the uncracked excess at rise 0.60 m is 0.1012 (smooth) and 0.1045 (cross). The 10 % line is the NOTE to EN 1998-1 4.3.1(4), author's copy.
+
+| Layout | L/D | alpha* |
+|---|---:|---:|
+| Seven equal bays | 0.300 | 54.651 |
+| Seven equal bays | 0.500 | 97.479 |
+| Seven equal bays | 1.000 | 247.188 |
+| Seven equal bays | 2.000 | 495.420 |
+| Anchor bays | 0.314 | 63.052 |
+
+| Cell on the anchor bays | Et/(E T) | Gt/(G T) | alpha | Uncracked excess | Half Et, Gt: alpha | Half: excess |
+|---|---:|---:|---:|---:|---:|---:|
+| Smooth, rise 0 | 1.00000 | 1.00000 | 142.82 | 0.0509 | 71.41 | 0.0908 |
+| Cross, rise 0 | 0.94989 | 0.89831 | 128.58 | 0.0545 | 64.29 | 0.0965 |
+| Smooth, rise 0.30 m | 0.46875 | 0.65578 | 92.15 | 0.0854 | 46.07 | 0.1417 |
+| Cross, rise 0.30 m | 0.43480 | 0.60185 | 84.62 | 0.0908 | 42.31 | 0.1494 |
+| Smooth, rise 0.60 m | 0.40763 | 0.46892 | 66.56 | 0.1012 | 33.28 | 0.1648 |
+| Cross, rise 0.60 m | 0.38984 | 0.45189 | 64.12 | 0.1045 | 32.06 | 0.1692 |
+
+K_f of the ground storey, beam inertia factor 2.0, is 1.174970×10⁸ N/m. Two frames give alpha* 19.9956, against 20 from the definition of K_d. The beam element is −0.003 % from the closed deflection. [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt). The half is 4.3.1(7). *Author to confirm the clause, the storey, and the half.*
+
+| Gravity, 21×21, pinned boundary | Crown w, mm | Lowest positive factor | Crown sxx, Pa |
+|---|---:|---:|---|
+| Flat, 60 mm | −0.7956 | 25122.1 | +5.701984×10⁵ and −5.701984×10⁵ |
+| Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
+| Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
+
+[partE_validation/out/gravity_bay.txt](partE_validation/out/gravity_bay.txt). Rotations on the boundary are free. Density 2500 kg/m³. No knockdown. *Author to confirm the support and the density.*
+
+| Joint factor 0.1, flat 60 mm | Strip width | Et / continuous |
+|---|---:|---:|
+| 9×9 | 0.333 m | 0.58615 |
+| 15×15 | 0.200 m | 0.68666 |
+
+Factor 1 is the continuous floor. [partE_validation/out/joint_stiffness.txt](partE_validation/out/joint_stiffness.txt). *Author to confirm the strip.*
 
 ## Check it in three steps
 
@@ -89,12 +125,20 @@ PYTHONPATH=. python partE_validation/rung1_unit_cell.py
 PYTHONPATH=. python partE_validation/rung2_deep_beam.py
 PYTHONPATH=. python partE_validation/vault_bay.py
 PYTHONPATH=. python partE_validation/vault_rib.py
+PYTHONPATH=. python partE_validation/joint_stiffness.py
+PYTHONPATH=. python partE_validation/xstrut_check.py
+PYTHONPATH=. python partE_validation/rung4_storey.py
+PYTHONPATH=. python partE_validation/gravity_bay.py
+PYTHONPATH=. python partE_validation/alpha_star.py
 ```
 
-**3. Figure at the top**
+`alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above.
+
+**3. Figures**
 
 ```bash
 python scripts/readme_hero.py
+python scripts/alpha_fig.py
 ```
 
 Outputs: `partE_validation/out/`. The hero numbers: `docs/img/hero.json`.
@@ -135,6 +179,11 @@ Drawn from `partE_validation/out/vault_rib.txt` by [scripts/readme_hero.py](scri
 | <img src="docs/img/hero_light.png" alt="Extensional and shear stiffness of the flat plate, the smooth bay and one rib cross, divided by a flat 60 mm plate. Bars start at zero." width="720"> | |
 | Equal-volume rows of the smooth shell and one rib cross. Source: `partE_validation/out/vault_rib.txt`. | |
 
+| alpha* | |
+|---|---|
+| <img src="docs/img/alpha_light.png" alt="Left: alpha-star of seven equal bays is 54.651, 97.479, 247.188 and 495.420 at L/D 0.3, 0.5, 1 and 2. Right: uncracked displacement excess, with the rise 0.60 m bars at 0.1012 and 0.1045 above the 0.10 line." width="720"> | |
+| Drawn by `scripts/alpha_fig.py` from `partE_validation/out/alpha_star.txt`. | |
+
 ## Validation
 
 | Check | Limit | Result | File |
@@ -143,6 +192,9 @@ Drawn from `partE_validation/out/vault_rib.txt` by [scripts/readme_hero.py](scri
 | Rung 2. Deep beam against Timoshenko | 2 % | PASS. Worst error 0.21 %. Shear share 3.5 % to 36.5 % | [partE_validation/out/rung2_deep_beam.txt](partE_validation/out/rung2_deep_beam.txt) |
 | Rise zero against the flat cell | 0.1 % | PASS. Et 1.684e-06 %, Gt 1.155e-12 % | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
 | Smooth rise 0 on the rib mesh | exact E T | 1.00000 and 1.00000. The cross has no pass mark | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
+| Rung 4. Shell deep beam against its own Et, Gt, 3 m bay | 5 % | Flat −2.93 %, pass. Rise 0.60 m +15.80 %, fail | [partE_validation/out/rung4_storey.txt](partE_validation/out/rung4_storey.txt) |
+| X-strut, calibrated on Et and Gt, checked on the 12 m deep beam | 5 % | 1 m panel +9.83 %. 0.5 m panel +12.74 %. Both fail | [partE_validation/out/xstrut_check.txt](partE_validation/out/xstrut_check.txt) |
+| Two-frame alpha* | 20, from the definition of K_d | 19.9956. Beam element −0.003 % | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt) |
 
 Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. ShellBench is imported, not edited.
 
@@ -154,16 +206,18 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | Choices still to confirm | [docs/decisions.md](docs/decisions.md) |
 | The smooth-bay mesh record | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
 | The rib cross | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
-| The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py) |
-| The figure script | [scripts/readme_hero.py](scripts/readme_hero.py) |
+| alpha*, the joint strip, gravity | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt), [joint_stiffness.txt](partE_validation/out/joint_stiffness.txt), [gravity_bay.txt](partE_validation/out/gravity_bay.txt) |
+| Preprint v1 | [docs/preprint_v1.md](docs/preprint_v1.md) |
+| The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py), [reduced.py](partA_mechanics/reduced.py) |
+| The figure scripts | [scripts/readme_hero.py](scripts/readme_hero.py), [scripts/alpha_fig.py](scripts/alpha_fig.py) |
 
 | Folder | Brief part | State |
 |---|---|---|
-| `partA_mechanics/` | Unit cell, smooth bay, one rib cross | Solver and the two bays above |
+| `partA_mechanics/` | Unit cell, vault bay, reduced diaphragm | Solver, Timoshenko K_d, X-strut grid |
 | `partB_generator/` | Floor generator | Not started |
 | `partC_building/` | Whole building | Not started |
 | `partD_optimise/` | NSGA-II | Not started. The brief forbids it before the rungs pass |
-| `partE_validation/` | Rungs 1–8 | Rungs 1 and 2, and the smooth bay |
+| `partE_validation/` | Rungs 1–8 | Rungs 1, 2 and the deflection half of 4. Joint strip, gravity, alpha* |
 
 ## Citation
 
@@ -172,7 +226,7 @@ There is no archived release and no DOI. Cite the code and the record as:
 ```bibtex
 @software{hasib2026shellfloors,
   author = {Hasib, Syed Nafiz Reja},
-  title  = {In-plane stiffness of one smooth concrete vault bay against a flat plate of equal volume},
+  title  = {One vault bay: in-plane stiffness, a diaphragm ratio, and gravity},
   year   = {2026},
   url    = {https://github.com/syednafizreja/seismic-shell-floor-design}
 }

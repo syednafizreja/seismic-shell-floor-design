@@ -1,0 +1,10 @@
+X-strut diaphragm. Flat plate. Chords and diagonals calibrated on one panel.
+The deep-beam deflection is not used in the calibration.
+E = 3.3e+10 Pa, nu = 0.2, t = 0.06 m, L = 12.0 m, D = 6.0 m, q = 1e+04 N/m
+target Et 1.980000e+09 N/m, Gt 8.250000e+08 N/m
+shell mid-span 0.11915 mm, Timoshenko 0.11939 mm
+panel m   EA chord N    EA diagonal N   back-check Et %   Gt %    X-strut mm   error
+  1.00  5.775000e+08  1.166726e+09  -5.051e-06  +1.212e-05   0.13087    +9.83 %
+  0.50  2.887500e+08  5.833631e+08  +0.000e+00  +0.000e+00   0.13433   +12.74 %
+largest |error| 12.74 %  ->  FAIL (limit 5 %, the brief's rung-4 deflection limit)
+The 5 % limit is the brief's rung 4. It is not a code clause.

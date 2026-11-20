@@ -1,0 +1,7 @@
+Rung 4 deflection: shell deep beam against Timoshenko using Et, Gt of the same mesh.
+Bay 3.0 m square, mesh 12x12, q = 1e+04 N/m. Limit 5 % from the brief.
+case                         t mm    Et/ET    Gt/GT     FE mm    Timoshenko mm    error
+flat                           60.0  1.00000  1.00000   0.00759   0.00782    -2.93 %
+smooth rise 0.60 equal V       54.9  0.40784  0.46934   0.02018   0.01743   +15.80 %
+worst |error| 15.80 %  ->  FAIL (limit 5 %)
+The cross is not in this check. The 38.4 m floor is not in this check.

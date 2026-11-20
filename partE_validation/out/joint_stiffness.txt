@@ -1,0 +1,23 @@
+Joint strip: modulus factor on the centreline column of elements.
+E = 3.3e+10 Pa, nu = 0.2. Bay 3.0 m square. Factor 1 is the continuous floor.
+Author to confirm the strip and the factor.
+case                         mesh   width m   factor     Et/E60     Gt/G60    Et/cont   Gt/cont
+flat 60 mm                    9x9    0.3333    1.00    1.00000    1.00000   1.00000   1.00000
+flat 60 mm                    9x9    0.3333    0.50    0.90678    0.91324   0.90678   0.91324
+flat 60 mm                    9x9    0.3333    0.20    0.73378    0.78250   0.73378   0.78250
+flat 60 mm                    9x9    0.3333    0.10    0.58615    0.69448   0.58615   0.69448
+vault rise 0.60 equal V       9x9    0.3333    1.00    0.40816    0.47026   1.00000   1.00000
+vault rise 0.60 equal V       9x9    0.3333    0.50    0.37295    0.41699   0.91374   0.88673
+vault rise 0.60 equal V       9x9    0.3333    0.20    0.32852    0.32635   0.80486   0.69399
+vault rise 0.60 equal V       9x9    0.3333    0.10    0.29541    0.25580   0.72376   0.54397
+equal-volume thickness on the 9x9 vault: 54.93 mm
+flat 60 mm                   15x15   0.2000    1.00    1.00000    1.00000   1.00000   1.00000
+flat 60 mm                   15x15   0.2000    0.50    0.94118    0.94419   0.94118   0.94419
+flat 60 mm                   15x15   0.2000    0.20    0.81536    0.84412   0.81536   0.84412
+flat 60 mm                   15x15   0.2000    0.10    0.68666    0.76294   0.68666   0.76294
+vault rise 0.60 equal V      15x15   0.2000    1.00    0.40772    0.46909   1.00000   1.00000
+vault rise 0.60 equal V      15x15   0.2000    0.50    0.38613    0.43506   0.94704   0.92746
+vault rise 0.60 equal V      15x15   0.2000    0.20    0.35549    0.36704   0.87190   0.78246
+vault rise 0.60 equal V      15x15   0.2000    0.10    0.32852    0.30441   0.80576   0.64894
+equal-volume thickness on the 15x15 vault: 54.90 mm
+Et/E60 and Gt/G60 use the flat 60 mm plate. Et/cont is the same row at factor 1.

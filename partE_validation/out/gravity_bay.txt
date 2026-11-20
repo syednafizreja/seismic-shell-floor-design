@@ -1,0 +1,18 @@
+Gravity on the 3 m bay. Boundary translations fixed, rotations free. rho = 2500 kg/m3, g = 9.81 m/s2.
+Author to confirm the support and the density. No knockdown is applied.
+Mesh 21x21, the rib mesh. Linear S8R.
+flat, rise 0, 60 mm
+  thickness shell 60.00 mm, rib 60.00 mm, area/plan 1.0000
+  crown w -0.7956 mm, largest |w| 0.7956 mm, crown |w|/span 2.652091e-04
+  lowest positive buckling factor on self-weight 25122.1  factors [25122.12, 26021.06, 28177.66, 30676.86]
+  crown sxx, two faces 5.701984e+05 Pa and -5.701984e+05 Pa. Negative is compression.
+smooth, rise 0.60 m, equal volume
+  thickness shell 54.89 mm, rib 54.89 mm, area/plan 1.0931
+  crown w -0.0022 mm, largest |w| 0.0047 mm, crown |w|/span 7.484920e-07
+  lowest positive buckling factor on self-weight 4933.37  factors [4933.366, 5005.798, 5161.136, 6022.991]
+  crown sxx, two faces -1.941393e+04 Pa and -1.684599e+04 Pa. Negative is compression.
+cross, rise 0.60 m, equal volume
+  thickness shell 50.00 mm, rib 102.53 mm, area/plan 1.0931
+  crown w -0.0024 mm, largest |w| 0.0046 mm, crown |w|/span 7.977767e-07
+  lowest positive buckling factor on self-weight 5210.6  factors [5210.596, 5378.011, 5549.392, 5743.66]
+  crown sxx, two faces -1.867630e+04 Pa and -1.325382e+04 Pa. Negative is compression.

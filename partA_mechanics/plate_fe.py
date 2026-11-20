@@ -74,12 +74,46 @@ def _shell_sections(els, t, thickness) -> list[str]:
     return out
 
 
-def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all", thickness=None) -> str:
+def _modulus_sections(els, t, E, nu, rho, thickness, modulus) -> list[str]:
+    """One material and one shell section per distinct (modulus, thickness).
+
+    EALL still holds every element. Used when a joint strip changes the modulus.
+    The scalar path in ``_deck`` does not call this, so an unjointed deck is unchanged.
+    """
+    th = np.full(len(els), float(t)) if thickness is None else np.asarray(thickness, float)
+    em = np.asarray(modulus, float)
+    if th.shape != (len(els),) or em.shape != (len(els),):
+        raise ValueError("modulus and thickness must have one value per element")
+    groups: dict[tuple[float, float], list[int]] = {}
+    order: list[tuple[float, float]] = []
+    for k, (ev, tv) in enumerate(zip(em, th)):
+        key = (float(f"{ev:.9g}"), float(f"{tv:.9g}"))
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(k + 1)
+    out = []
+    for i, (ev, tv) in enumerate(order):
+        name, elset = f"M{i}", f"EM{i}"
+        out += [f"*MATERIAL, NAME={name}", "*ELASTIC", f"{ev:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}",
+                f"*ELSET, ELSET={elset}"]
+        ids = groups[(ev, tv)]
+        for s in range(0, len(ids), 16):
+            out.append(", ".join(str(n) for n in ids[s:s + 16]))
+        out += [f"*SHELL SECTION, ELSET={elset}, MATERIAL={name}", f"{tv:.9g}"]
+    return out
+
+
+def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all", thickness=None,
+          modulus=None) -> str:
     out = ["*NODE"] + [f"{i + 1}, {x:.12g}, {y:.12g}, {z:.12g}" for i, (x, y, z) in enumerate(xyz)]
     out += ["*ELEMENT, TYPE=S8R, ELSET=EALL"] + [f"{k + 1}, " + ", ".join(map(str, e)) for k, e in enumerate(els)]
-    out += ["*NSET, NSET=NALL, GENERATE", f"1, {len(xyz)}, 1",
-            "*MATERIAL, NAME=C", "*ELASTIC", f"{E:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}"]
-    out += _shell_sections(els, t, thickness)
+    out += ["*NSET, NSET=NALL, GENERATE", f"1, {len(xyz)}, 1"]
+    if modulus is None:
+        out += ["*MATERIAL, NAME=C", "*ELASTIC", f"{E:.9g}, {nu:.6g}", "*DENSITY", f"{rho:.6g}"]
+        out += _shell_sections(els, t, thickness)
+    else:
+        out += _modulus_sections(els, t, E, nu, rho, thickness, modulus)
     # A flat cell is a membrane: every node is held at z = 0. A vault holds z only on its
     # plan boundary, so the shell can move vertically between the edges.
     if lock_w == "all":
@@ -95,8 +129,13 @@ def _deck(xyz, els, t, E, nu, rho, bcs, loads, grav=None, lock_w="all", thicknes
 
 def _read_dat(path: Path, n: int):
     """Displacements and reaction forces of all n nodes from a CalculiX .dat file."""
+    return _read_dat_text(path.read_text(), n)
+
+
+def _read_dat_text(text: str, n: int):
+    """Displacements and reaction forces of all n nodes from CalculiX .dat text."""
     U, RF, cur = np.zeros((n, 3)), np.zeros((n, 3)), None
-    for ln in path.read_text().splitlines():
+    for ln in text.splitlines():
         s = ln.strip().lower()
         if s.startswith("displacements"):
             cur = U
@@ -111,17 +150,25 @@ def _read_dat(path: Path, n: int):
     return U, RF
 
 
-def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None, lock_w="all", thickness=None):
+def run_dat(deck: str) -> str:
+    """Run a deck in its own work directory and return the CalculiX .dat text."""
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
-        (d / "job.inp").write_text(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav, lock_w, thickness))
+        (d / "job.inp").write_text(deck)
         r = run_ccx("job", d, threads=2)
-        if not (d / "job.dat").exists():
+        dat = d / "job.dat"
+        if not dat.exists():
             raise RuntimeError("ccx failed:\n" + r.stdout[-2000:])
-        return _read_dat(d / "job.dat", len(xyz))
+        return dat.read_text()
 
 
-def membrane_stiffness(lx, ly, t, E, nu, nx=8, ny=8):
+def solve(xyz, els, t, E, nu, bcs, loads=(), rho=0.0, grav=None, lock_w="all", thickness=None,
+          modulus=None):
+    text = run_dat(_deck(xyz, els, t, E, nu, rho, bcs, loads, grav, lock_w, thickness, modulus))
+    return _read_dat_text(text, len(xyz))
+
+
+def membrane_stiffness(lx, ly, t, E, nu, nx=8, ny=8, modulus=None):
     """Membrane stiffness A (3x3, Voigt order xx, yy, xy with engineering shear) of a plate cell.
 
     Each column comes from one affine state u = eps . x imposed on every boundary node; the
@@ -136,7 +183,7 @@ def membrane_stiffness(lx, ly, t, E, nu, nx=8, ny=8):
         for i in bnd:
             x, y, _ = xyz[i]
             bcs += [(i + 1, 1, exx * x + 0.5 * gxy * y), (i + 1, 2, eyy * y + 0.5 * gxy * x)]
-        _, RF = solve(xyz, els, t, E, nu, bcs)
+        _, RF = solve(xyz, els, t, E, nu, bcs, modulus=modulus)
         # average resultants from the work of the reactions: N . eps * area = sum RF . u
         R = RF[bnd, :2]
         P = xyz[bnd, :2]
@@ -198,7 +245,7 @@ def faceted_area(xyz, els) -> float:
     return float(element_areas(xyz, els).sum())
 
 
-def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8, thickness=None):
+def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8, thickness=None, modulus=None):
     """Plan membrane stiffness of one sinusoidal vault bay.
 
     The same three affine plan strains as ``membrane_stiffness`` are imposed on the boundary.
@@ -218,7 +265,7 @@ def shell_membrane_stiffness(lx, ly, t, E, nu, rise, nx=8, ny=8, thickness=None)
             bcs += [(i + 1, 1, exx * x + 0.5 * gxy * y),
                     (i + 1, 2, eyy * y + 0.5 * gxy * x),
                     (i + 1, 3, 0.0)]
-        _, RF = solve(xyz, els, t, E, nu, bcs, lock_w="boundary", thickness=thickness)
+        _, RF = solve(xyz, els, t, E, nu, bcs, lock_w="boundary", thickness=thickness, modulus=modulus)
         R = RF[bnd, :2]
         P = xyz[bnd, :2]
         Sxx = np.sum(R[:, 0] * P[:, 0]) / (lx * ly)
