@@ -5,8 +5,8 @@ and docs/decisions.md. Et/cont and Gt/cont are the same row divided by the
 factor-1 row. The print keeps five decimals, so that quotient can differ from
 the printed continuous ratio by a few hundredths of a thousandth. The flat
 factor-0.1 ratio stays with its strip width. The methods log names the vault
-factor-0.1 Et/(E T) and Et/cont. Does not call CalculiX, does not
-write the file, and does not read the floor page.
+factor-0.1 Et/(E T), Et/cont, Gt/(G T) and Gt/cont. Does not call CalculiX,
+does not write the file, and does not read the floor page.
 """
 from __future__ import annotations
 
@@ -57,6 +57,8 @@ def main():
             "gtcont": float(gtcont),
             "et60_s": et60,
             "etcont_s": etcont,
+            "gt60_s": gt60,
+            "gtcont_s": gtcont,
             "width_s": width,
         })
     if len(groups) != 4 or sum(len(rows) for rows in groups.values()) != 16:
@@ -95,7 +97,8 @@ def main():
             flat_pairs.append((low["etcont_s"], low["width_s"]))
         else:
             vault_tokens.append(base["et60_s"])
-            vault_low.append((mesh, low["et60_s"], low["etcont_s"]))
+            vault_low.append((
+                mesh, low["et60_s"], low["etcont_s"], low["gt60_s"], low["gtcont_s"]))
 
     thick = {mesh: float(mm) for mesh, mm in THICK.findall(text)}
     if set(thick) != {"9x9", "15x15"}:
@@ -117,9 +120,11 @@ def main():
         for token in vault_tokens:
             if token not in decisions:
                 problems.append(f"decisions has no vault factor-1 Et/E60 {token}")
-        for mesh, et60, etcont in vault_low:
+        for mesh, et60, etcont, gt60, gtcont in vault_low:
             if et60 not in decisions or etcont not in decisions:
                 problems.append(f"decisions has no vault factor-0.1 {et60} and {etcont} on {mesh}")
+            if gt60 not in decisions or gtcont not in decisions:
+                problems.append(f"decisions has no vault factor-0.1 {gt60} and {gtcont} on {mesh}")
         if len(flat_pairs) == 2:
             for token, width in flat_pairs:
                 shown = f"{float(width):.3f}"
