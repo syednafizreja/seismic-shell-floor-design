@@ -7,7 +7,8 @@ and cracked pair on one row. The preprint and the methods log state the
 anchor spans and the depth written in alpha_star.py. That file and the
 documents state the ShellBench anchor, C40, E = 32.5 GPa and 600 mm columns.
 The print, the preprint and the methods log name BS EN 1998-1:2004, PDF page 55,
-printed page 53. Does not call OpenSees
+printed page 53. The alpha figure alt states the four equal-bay values and the
+two rise 0.60 m excesses. Does not call OpenSees
 and does not write the file.
 """
 from __future__ import annotations
@@ -110,6 +111,20 @@ def main():
         ):
             if not token_in(token, hits[0]):
                 problems.append(f"{label}: README splits {kind} {token} from alpha {alpha}")
+
+    equals = [star for name, _ld, star in stars if name == "equal"]
+    excess_of = {label: excess for label, _et, _gt, _alpha, excess, _cracked, _cracked_excess in cells}
+    if len(equals) == 4 and "smooth 0.60" in excess_of and "cross 0.60" in excess_of:
+        left = (
+            f"alpha-star of seven equal bays is {equals[0]}, {equals[1]}, "
+            f"{equals[2]} and {equals[3]} at L/D 0.3, 0.5, 1 and 2."
+        )
+        right = (
+            "the rise 0.60 m bars at "
+            f"{excess_of['smooth 0.60']} and {excess_of['cross 0.60']} above the 0.10 line."
+        )
+        if left not in readme or right not in readme:
+            problems.append("the alpha figure alt no longer states the recorded values")
 
     source = (ROOT / "partE_validation" / "alpha_star.py").read_text(encoding="utf-8")
     depth_src = re.search(r"^DEPTH = ([0-9.+\s]+)$", source, re.M)
