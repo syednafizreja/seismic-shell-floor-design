@@ -3,7 +3,9 @@
 Reads the compression prints, README.md, the preprint and the methods log.
 The smooth rise 0.60 m print has no farthest-centroid line: those elements
 stay at the four corners. Each largest principal has to stay in that layout's
-sentences. Does not call CalculiX and does not write the prints.
+sentences. Each print keeps 20 tensile elements within one element pitch of
+the plan boundary, and each principal on the next line is named in the
+methods log. Does not call CalculiX and does not write the prints.
 """
 from __future__ import annotations
 
@@ -90,6 +92,18 @@ def main():
             continue
         if "With both principals tensile 0." not in text:
             problems.append(f"{path.name} no longer says both principals stay compressive")
+        edge = "Of the tensile elements, 20 lie within one element pitch of the plan boundary."
+        lines = text.splitlines()
+        if edge not in lines:
+            problems.append(f"{path.name} no longer keeps 20 tensile elements within one element pitch")
+        else:
+            inner = lines[lines.index(edge) + 1] if lines.index(edge) + 1 < len(lines) else ""
+            found = re.findall(r"([0-9.]+)e[+-]\d+ Pa", inner)
+            if not found:
+                problems.append(f"{path.name} has no interior principal")
+            for token in found:
+                if token not in decisions:
+                    problems.append(f"{path.name}: decisions has no interior principal {token}")
         n = count.group(1)
         mantissa = large.group(1)
         for name, body in (("README", readme), ("preprint", preprint)):
