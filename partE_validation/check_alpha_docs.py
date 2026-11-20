@@ -2,7 +2,8 @@
 
 Reads alpha_star.txt only. The three sensitivity rows and the two unused frame
 stiffnesses stay in that file. They are not required in the documents, which
-do not quote them. Does not call OpenSees and does not write the file.
+do not quote them. The README table keeps each cell's Et, Gt, alpha, excess
+and cracked pair on one row. Does not call OpenSees and does not write the file.
 """
 from __future__ import annotations
 
@@ -26,6 +27,10 @@ def require(token, docs, label, problems):
     for name, text in docs:
         if token not in text:
             problems.append(f"{label}: {name} has no {token}")
+
+
+def token_in(token, text):
+    return re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", text) is not None
 
 
 def main():
@@ -78,7 +83,7 @@ def main():
         "smooth rise 0", "cross rise 0", "smooth 0.30", "cross 0.30", "smooth 0.60", "cross 0.60",
     ]:
         problems.append("cell rows are not the six recorded cases")
-    for label, _et, _gt, alpha, excess, cracked, cracked_excess in cells:
+    for label, et, gt, alpha, excess, cracked, cracked_excess in cells:
         for token, kind in (
             (alpha, "alpha"), (excess, "excess"), (cracked, "cracked alpha"),
             (cracked_excess, "cracked excess"),
@@ -87,6 +92,19 @@ def main():
         if label in QUOTED:
             require(excess, (("preprint", preprint), ("decisions", decisions)), f"{label} excess", problems)
             require(cracked_excess, (("preprint", preprint),), f"{label} cracked excess", problems)
+        hits = [
+            line for line in readme.splitlines()
+            if line.startswith("|") and token_in(alpha, line)
+        ]
+        if len(hits) != 1:
+            problems.append(f"{label}: README has {len(hits)} table rows for alpha {alpha}")
+            continue
+        for token, kind in (
+            (et, "Et"), (gt, "Gt"), (excess, "excess"),
+            (cracked, "cracked alpha"), (cracked_excess, "cracked excess"),
+        ):
+            if not token_in(token, hits[0]):
+                problems.append(f"{label}: README splits {kind} {token} from alpha {alpha}")
 
     if problems:
         print("\n".join(problems))
