@@ -2,12 +2,16 @@
 
 In-plane stiffness of one vault bay, the diaphragm ratio of that stiffness on the anchor frame, and gravity on the same bay. The generator, the building loop and the search are not in this record.
 
-[Key finding](#key-finding) | [Check it](#check-it-in-three-steps) | [Method](#method) | [Figures](#figures) | [Validation](#validation) | [Brief](brief.md) | [Cite](#citation)
+[Key finding](#key-finding) | [Check it](#check-it-in-three-steps) | [Method](#method) | [Figures](#figures) | [Validation](#validation) | [Brief](brief.md) | [About](#about)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero_dark.png">
   <img alt="Two bar charts on the same scale, bars starting at zero. Extensional ratio to a flat 60 mm plate: flat 1.00000, smooth rise 0.30 m 0.46875, cross 0.43480, smooth rise 0.60 m 0.40763, cross 0.38984. Shear ratio: 1.00000, 0.65578, 0.60185, 0.46892, 0.45189." src="docs/img/hero_light.png">
 </picture>
+
+| Rise 0.60 m, equal volume | Smooth shell | One rib cross | alpha* at L/D 0.3 | alpha* at L/D 2 |
+|---|---:|---:|---:|---:|
+| Et/(E T), and alpha* on seven equal bays | 0.40763 | 0.38984 | 54.651 | 495.420 |
 
 ## Key finding
 
@@ -38,6 +42,9 @@ At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369
 
 The earlier mesh table uses another ratio. Et/(E t) there divides by the thickness in the row, not by 60 mm. For the 16×16 equal-volume row at rise 0.60 m, 0.44562 / 1.0930 = 0.40770, beside 0.40763 on the 21×21 mesh. [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt).
 
+<details>
+<summary>Mesh record, including the 6×3 m bay</summary>
+
 | Case | Mesh | t mm | Area/plan | Et/(E t) | Gt/(G t) |
 |---|---|---:|---:|---:|---:|
 | Square 3 m, rise 0 | 8×8 | 60.0 | 1.0000 | 1.00000 | 1.00000 |
@@ -63,6 +70,8 @@ Rise zero against the flat cell in the same file: Et 1.684e-06 %, Gt 1.155e-12 %
 | 6×3 m, rise 0.60 m, 8×4 to 16×8 | 0.82641 to 0.82359 | 0.59070 to 0.57860 |
 
 The 6×3 m shear ratio still moves between those two meshes. The long direction of that bay is flatter than the square at the same rise, and its equal-volume Et/(E t) is 0.82164.
+
+</details>
 
 | Limit | Record |
 |---|---|
@@ -232,6 +241,14 @@ There is no archived release and no DOI. Cite the code and the record as:
 }
 ```
 
-## Author and licence
+## About
 
-Syed Nafiz Reja Hasib · [ORCID 0009-0002-7162-7890](https://orcid.org/0009-0002-7162-7890) · Code: MIT ([LICENSE](LICENSE))
+Syed Nafiz Reja Hasib, civil and structural engineer. [ORCID 0009-0002-7162-7890](https://orcid.org/0009-0002-7162-7890).
+
+This repository is the record of one vault bay: its in-plane stiffness, a diaphragm ratio on the anchor spans, and gravity on that bay. There is no carbon optimum and no search. The question is fixed in [brief.md](brief.md). Every number above is taken from a file named beside it.
+
+The public page states the same record and does not link this repository: [seismic shell floors](https://syednafizreja.github.io/work/seismic-shell-floors/).
+
+## Licence
+
+Code: MIT ([LICENSE](LICENSE)).

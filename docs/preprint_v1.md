@@ -69,5 +69,3 @@ The 5 % figure is the brief's rung-4 limit. It is not a code clause. The Timoshe
 ## What this version does not show
 
 There is no optimum shape and no saving in whole-building carbon. The generator, the frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross and one joint strip are not a segmented floor.
-
-The analysis code was written with AI assistance and reviewed by the author, as the CV already states.
