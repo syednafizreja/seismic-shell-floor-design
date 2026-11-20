@@ -1,0 +1,13 @@
+Rise 0.30 m. This file does not replace gravity_bay.txt.
+Same supports, density and volume rule as gravity_bay.py. No knockdown is applied.
+Mesh 21x21. Linear S8R.
+smooth, rise 0.30 m, equal volume
+  thickness shell 58.58 mm, rib 58.58 mm, area/plan 1.0243
+  crown w from the existing stress print -0.006964 mm, largest |w| 0.011468 mm
+  lowest positive buckling factor on self-weight 2319.99  factors [2319.992, 2612.028, 3210.253, 3461.694]
+  Static stresses stay in the existing stress print. This run is the buckle only.
+cross, rise 0.30 m, equal volume
+  thickness shell 50.00 mm, rib 142.24 mm, area/plan 1.0243
+  crown w -0.0095 mm, largest |w| 0.0116 mm, crown |w|/span 3.159521e-06
+  lowest positive buckling factor on self-weight 2789  factors [2789.003, 2843.223, 3139.217, 3745.398]
+  crown sxx, two faces -4.546519e+04 Pa and -3.102803e+04 Pa. Negative is compression.
