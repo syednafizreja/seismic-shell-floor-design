@@ -1,0 +1,11 @@
+Rise 0.30 m. Same diagonals and the same volume rule. This file does not replace diagonal_bay.txt.
+Two diagonals on the sine bay. Linear S8R. Not the recorded cross.
+Bay 3.0 m, rise 0.3 m, mesh 21x21. Shell 50 mm.
+Rib elements 41. Rib thickness 143.33 mm. area/plan 1.0243.
+Author to confirm the diagonals, the half-pitch width and the 50 mm shell.
+No knockdown is applied.
+Et/(E T) 0.44408   Gt/(G T) 0.65435
+crown w -0.0093 mm, largest |w| 0.0125 mm
+lowest positive buckling factor on self-weight 1856.27  factors [1856.269, 2026.763, 2363.419, 2670.051]
+crown sxx, two faces -3.709125e+04 Pa and -2.155468e+04 Pa. Negative is compression.
+H1 stays open. One diagonal pair is not the ribbed floor.

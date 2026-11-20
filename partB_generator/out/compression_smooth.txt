@@ -1,0 +1,10 @@
+Shell-local membrane of the smooth rise 0.60 m bay under self-weight.
+Positive principal stress is tension. Average of the two faces.
+Elements 441. With a tensile principal 24.
+With both principals tensile 0.
+Of the tensile elements, 20 lie within one element pitch of the plan boundary.
+One element further in, still at the four corners: x 0.2143 m, y 0.2143 m, 3.862984e+03 Pa; x 0.2143 m, y 2.7857 m, 3.862984e+03 Pa; x 2.7857 m, y 0.2143 m, 3.862984e+03 Pa; x 2.7857 m, y 2.7857 m, 3.862984e+03 Pa.
+Largest principal 6.950346e+03 Pa at x 2.9286 m, y 2.9286 m.
+Smallest principal -6.397869e+04 Pa.
+Author to confirm that a positive principal membrane stress is the tension check.
+No code limit is applied. The crown of this bay is already on record as compression.
