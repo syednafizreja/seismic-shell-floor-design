@@ -158,12 +158,13 @@ PYTHONPATH=. python partE_validation/gravity_bay.py
 PYTHONPATH=. python partE_validation/alpha_star.py
 ```
 
-`alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above.
+`alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above. `check_alpha_record.py` recomputes alpha and alpha* from that printed K_f, and it checks the six cell ratios against `vault_rib.txt`. It does not call OpenSees and it does not write the file.
 
 `rung4_layouts.py` reads `partB_generator/out/smooth_gravity_stress.dat` and `smooth_gravity_stress_030.dat` for the stress-line rows. Those files are the gravity prints. The script does not rewrite them. The commands above rewrite their result files. The copies in this repository are the record.
 
 ```bash
 PYTHONPATH=. python partE_validation/check_rung4_record.py
+PYTHONPATH=. python partE_validation/check_alpha_record.py
 ```
 
 `check_rung4_record.py` reads `rung4_layouts.txt`, `rung4_cross.txt` and `rung4_storey.txt`. It recomputes the Timoshenko column from the printed stiffness. It does not call CalculiX and it does not write those files.
