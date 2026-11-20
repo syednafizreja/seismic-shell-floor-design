@@ -3,7 +3,9 @@
 Reads alpha_star.txt only. The three sensitivity rows and the two unused frame
 stiffnesses stay in that file. They are not required in the documents, which
 do not quote them. The README table keeps each cell's Et, Gt, alpha, excess
-and cracked pair on one row. Does not call OpenSees and does not write the file.
+and cracked pair on one row. The preprint and the methods log state the
+anchor spans and the depth written in alpha_star.py. Does not call OpenSees
+and does not write the file.
 """
 from __future__ import annotations
 
@@ -105,6 +107,21 @@ def main():
         ):
             if not token_in(token, hits[0]):
                 problems.append(f"{label}: README splits {kind} {token} from alpha {alpha}")
+
+    source = (ROOT / "partE_validation" / "alpha_star.py").read_text(encoding="utf-8")
+    depth_src = re.search(r"^DEPTH = ([0-9.+\s]+)$", source, re.M)
+    bays_src = re.search(r"^BAYS = \(([0-9.,\s]+)\)", source, re.M)
+    if not depth_src or not bays_src:
+        problems.append("alpha_star.py no longer states the anchor spans and the depth")
+    else:
+        depth = f"{sum(float(part) for part in depth_src.group(1).split('+')):.1f}"
+        spans = [float(part) for part in bays_src.group(1).split(",")]
+        comma = ", ".join(f"{span:.1f}" for span in spans)
+        prose = ", ".join(f"{span:.1f}" for span in spans[:-1]) + f" and {spans[-1]:.1f}"
+        if f"Spans {comma} m and depth {depth} m." not in decisions:
+            problems.append("decisions no longer states the anchor spans and the depth")
+        if f"The anchor spans are {prose} m, and the depth is {depth} m." not in preprint:
+            problems.append("preprint no longer states the anchor spans and the depth")
 
     if problems:
         print("\n".join(problems))
