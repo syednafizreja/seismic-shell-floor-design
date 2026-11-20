@@ -1,7 +1,7 @@
 """Check the printed beam arithmetic against the Timoshenko formula.
 
-Reads rung 1, rung 2, the rung-4 files and the X-strut file. Does not call
-CalculiX and does not write them.
+Reads rung 1, rung 2, the rung-4 files, the w-lock print and the X-strut
+file. Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -124,6 +124,28 @@ def check_rung2():
         got = 100.0 * (float(fe) / float(timo) - 1.0)
         if abs(got - float(err)) > 0.08:
             problems.append(f"rung 2 L/D {ratio}: error {got:+.2f} %, file {err} %")
+    worst = re.search(
+        r"worst error against Timoshenko, all L/D and both meshes: (\d+\.\d+) %\s+->\s+"
+        r"(PASS|FAIL) \(limit (\d+) %\)",
+        text,
+    )
+    if not worst or not rows:
+        problems.append("rung 2 has no worst-error line")
+    else:
+        stated = float(worst.group(1))
+        largest = max(abs(float(err)) for _, _, _, err, _ in rows)
+        if stated + 1e-9 < largest or abs(stated - largest) > 0.08:
+            problems.append(f"rung 2 worst {stated} % is not the largest row error {largest} %")
+        if worst.group(2) == "PASS" and stated > float(worst.group(3)):
+            problems.append("rung 2 says PASS above its limit")
+        shares = [float(share) for *_, share in rows]
+        phrase = f"{min(shares):.1f} % to {max(shares):.1f} %"
+        readme, preprint, decisions = docs()
+        if phrase not in readme:
+            problems.append(f"README has no rung-2 shear range '{phrase}'")
+        for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
+            if worst.group(1) not in body:
+                problems.append(f"{name} has no rung-2 worst error {worst.group(1)}")
     return problems
 
 
@@ -139,7 +161,32 @@ def check_rung1():
         problems.append("rung 1 Gt is not G t")
     if abs(float(match.group(3)) - NU) > 1e-12:
         problems.append("rung 1 nu is not 0.2")
+    worst = re.search(
+        r"worst relative error ([0-9.e+-]+) %\s+->\s+(PASS|FAIL) \(limit (\d+) %\)",
+        text,
+    )
+    if not worst:
+        problems.append("rung 1 has no worst-error line")
+    else:
+        stated = float(worst.group(1))
+        if worst.group(2) != "PASS" or stated > float(worst.group(3)):
+            problems.append("rung 1 worst line is not a pass inside its limit")
+        readme, preprint, decisions = docs()
+        for name, body in (("README", readme), ("decisions", decisions)):
+            if worst.group(1) not in body:
+                problems.append(f"{name} has no rung-1 worst error {worst.group(1)}")
+        if worst.group(1).split("e")[0] not in preprint:
+            problems.append("preprint has no rung-1 worst error")
     return problems
+
+
+def docs():
+    root = Path(__file__).resolve().parents[1]
+    return (
+        (root / "README.md").read_text(encoding="utf-8"),
+        (root / "docs" / "preprint_v1.md").read_text(encoding="utf-8"),
+        (root / "docs" / "decisions.md").read_text(encoding="utf-8"),
+    )
 
 
 def check_hero():
@@ -164,7 +211,12 @@ def check_hero():
 
 def main():
     problems = []
-    expected = {"rung4_layouts.txt": 7, "rung4_cross.txt": 2, "rung4_storey.txt": 2}
+    expected = {
+        "rung4_layouts.txt": 7,
+        "rung4_cross.txt": 2,
+        "rung4_storey.txt": 2,
+        "rung4_wlock.txt": 2,
+    }
     for name, n in expected.items():
         got = rows(OUT / name)
         if len(got) != n:
@@ -174,6 +226,22 @@ def main():
     problems.extend(check_rung2())
     problems.extend(check_rung1())
     problems.extend(check_hero())
+    wlock = (OUT / "rung4_wlock.txt").read_text(encoding="utf-8")
+    if "This file does not replace it." not in wlock:
+        problems.append("the w-lock print no longer leaves rung4_storey.txt in place")
+    locked = rows(OUT / "rung4_wlock.txt")
+    if locked:
+        worst_abs = max(abs(float(row["err"])) for row in locked)
+        if f"worst |error| {worst_abs:.2f} %  ->  FAIL (limit 5 %)" not in wlock:
+            problems.append("the w-lock worst line is not a fail at the larger printed error")
+        _, _, decisions = docs()
+        for row in locked:
+            for token in (row["err"].lstrip("+-"), row["fe"], row["timo"]):
+                if token not in decisions:
+                    problems.append(f"decisions has no w-lock {token}")
+    k_shear = re.search(r"k = (\d+\.\d+)", wlock)
+    if not k_shear or abs(float(k_shear.group(1)) - 5.0 / 6.0) > 1e-6:
+        problems.append("the w-lock print does not use k = 5/6")
     if problems:
         print("\n".join(problems))
         return 1
