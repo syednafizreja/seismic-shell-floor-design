@@ -9,7 +9,8 @@ The number of decimals is the one in the print, so 2789 stands for 2789.003.
 Each crown and face pair has to stay on the same table row as its factor.
 Where the methods log names a peak deflection, it is the printed largest |w|.
 Gravity prints a thickness to hundredths. vault_rib.txt prints the same
-thickness to tenths. Both stay as printed.
+thickness to tenths. Both stay as printed. The gravity print states
+rho = 2500 kg/m3 and g = 9.81 m/s2.
 """
 from __future__ import annotations
 
@@ -205,6 +206,12 @@ def main():
     readme = README.read_text(encoding="utf-8")
     preprint = PREPRINT.read_text(encoding="utf-8")
     decisions = DECISIONS.read_text(encoding="utf-8")
+    if "rho = 2500 kg/m3, g = 9.81 m/s2." not in bay:
+        problems.append("gravity_bay.txt no longer states rho = 2500 kg/m3 and g = 9.81 m/s2")
+    if "Density 2500 kg/m³, g = 9.81 m/s²." not in decisions:
+        problems.append("decisions no longer states the density and g")
+    if "Density 2500 kg/m³." not in preprint:
+        problems.append("preprint no longer states the density")
     both = (("README", readme), ("preprint", preprint))
     three = both + (("decisions", decisions),)
     for label, parsed, faces_in_decisions, stiff_text in records:
