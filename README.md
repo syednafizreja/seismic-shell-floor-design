@@ -168,7 +168,7 @@ PYTHONPATH=. python partE_validation/check_alpha_record.py
 PYTHONPATH=. python partE_validation/check_tension_record.py
 ```
 
-`check_rung4_record.py` reads `rung4_layouts.txt`, `rung4_cross.txt` and `rung4_storey.txt`. It recomputes the Timoshenko column from the printed stiffness. It does not call CalculiX and it does not write those files.
+`check_rung4_record.py` reads `rung4_layouts.txt`, `rung4_cross.txt`, `rung4_storey.txt` and `xstrut_check.txt`. It recomputes the Timoshenko column from the printed stiffness, and the two X-strut percentages from the printed deflections. It does not call CalculiX and it does not write those files.
 
 **3. Figures**
 
