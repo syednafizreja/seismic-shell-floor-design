@@ -1,6 +1,6 @@
-"""Check the printed rung-4 arithmetic against the Timoshenko formula.
+"""Check the printed beam arithmetic against the Timoshenko formula.
 
-Reads the result files, including the X-strut percentages. Does not call
+Reads rung 1, rung 2, the rung-4 files and the X-strut file. Does not call
 CalculiX and does not write them.
 """
 from __future__ import annotations
@@ -9,7 +9,7 @@ import re
 import sys
 from pathlib import Path
 
-from partA_mechanics.reduced import timoshenko_midspan
+from partA_mechanics.reduced import K_SHEAR, timoshenko_midspan
 from partE_validation.vault_rib import E, NU, T
 
 OUT = Path(__file__).parent / "out"
@@ -99,6 +99,48 @@ def check_xstrut():
     return problems
 
 
+def check_rung2():
+    text = (OUT / "rung2_deep_beam.txt").read_text(encoding="utf-8")
+    et, gt = E * T, G * T
+    depth = 6.0
+    problems = []
+    rows = re.findall(
+        r"L/D\s+(\d+)\s+FE\s+(\d+\.\d+) mm \(coarse\s+\d+\.\d+\)\s+"
+        r"Timoshenko\s+(\d+\.\d+) \(\s*([+-]\d+\.\d+) %\)\s+shear share\s+(\d+\.\d+)%",
+        text,
+    )
+    if len(rows) != 5:
+        problems.append(f"rung 2 rows {len(rows)}, record has 5")
+    for ratio, fe, timo, err, share in rows:
+        length = int(ratio) * depth
+        formula = timoshenko_midspan(length, depth, et, gt, Q)
+        if abs(formula - float(timo) * MM) > TIMO_TOL_M:
+            problems.append(f"rung 2 L/D {ratio}: formula {formula / MM:.5f} mm, file {timo} mm")
+        bend = 5 * Q * length ** 4 / (384 * et * depth ** 3 / 12)
+        shear = Q * length ** 2 / (8 * K_SHEAR * gt * depth)
+        if abs(100.0 * shear / formula - float(share)) > 0.05:
+            problems.append(f"rung 2 L/D {ratio}: shear share {100.0 * shear / formula:.1f} %, file {share} %")
+        got = 100.0 * (float(fe) / float(timo) - 1.0)
+        if abs(got - float(err)) > 0.08:
+            problems.append(f"rung 2 L/D {ratio}: error {got:+.2f} %, file {err} %")
+    return problems
+
+
+def check_rung1():
+    text = (OUT / "rung1_unit_cell.txt").read_text(encoding="utf-8")
+    match = re.search(r"exact: Et = ([0-9.e+]+) N/m, Gt = ([0-9.e+]+) N/m, nu = ([0-9.]+)", text)
+    problems = []
+    if not match:
+        return ["rung 1 has no exact Et, Gt line"]
+    if abs(float(match.group(1)) - E * T) / (E * T) > 1e-9:
+        problems.append("rung 1 Et is not E t")
+    if abs(float(match.group(2)) - G * T) / (G * T) > 1e-9:
+        problems.append("rung 1 Gt is not G t")
+    if abs(float(match.group(3)) - NU) > 1e-12:
+        problems.append("rung 1 nu is not 0.2")
+    return problems
+
+
 def main():
     problems = []
     expected = {"rung4_layouts.txt": 7, "rung4_cross.txt": 2, "rung4_storey.txt": 2}
@@ -108,6 +150,8 @@ def main():
             problems.append(f"{name}: {len(got)} rows, record has {n}")
         problems.extend(check(OUT / name))
     problems.extend(check_xstrut())
+    problems.extend(check_rung2())
+    problems.extend(check_rung1())
     if problems:
         print("\n".join(problems))
         return 1
