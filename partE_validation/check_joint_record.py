@@ -3,8 +3,9 @@
 Reads partE_validation/out/joint_stiffness.txt, README.md, docs/preprint_v1.md
 and docs/decisions.md. Et/cont and Gt/cont are the same row divided by the
 factor-1 row. The print keeps five decimals, so that quotient can differ from
-the printed continuous ratio by a few hundredths of a thousandth. Does not
-call CalculiX, does not write the file, and does not read the floor page.
+the printed continuous ratio by a few hundredths of a thousandth. The flat
+factor-0.1 ratio stays with its strip width. Does not call CalculiX, does not
+write the file, and does not read the floor page.
 """
 from __future__ import annotations
 
@@ -55,11 +56,13 @@ def main():
             "gtcont": float(gtcont),
             "et60_s": et60,
             "etcont_s": etcont,
+            "width_s": width,
         })
     if len(groups) != 4 or sum(len(rows) for rows in groups.values()) != 16:
         problems.append(f"{sum(len(rows) for rows in groups.values())} joint rows, record has 16")
 
     flat_tokens = []
+    flat_pairs = []
     vault_tokens = []
     for (case, mesh), rows in groups.items():
         n = int(mesh.split("x")[0])
@@ -87,6 +90,7 @@ def main():
         low = next(row for row in rows if row["factor"] == 0.1)
         if case.startswith("flat"):
             flat_tokens.append(low["etcont_s"])
+            flat_pairs.append((low["etcont_s"], low["width_s"]))
         else:
             vault_tokens.append(base["et60_s"])
 
@@ -110,6 +114,22 @@ def main():
         for token in vault_tokens:
             if token not in decisions:
                 problems.append(f"decisions has no vault factor-1 Et/E60 {token}")
+        if len(flat_pairs) == 2:
+            for token, width in flat_pairs:
+                shown = f"{float(width):.3f}"
+                other = next(item[0] for item in flat_pairs if item[0] != token)
+                hits = [
+                    line for line in readme.splitlines()
+                    if line.startswith("|") and token in line
+                ]
+                if len(hits) != 1 or shown not in hits[0]:
+                    problems.append(f"README splits {shown} m from flat factor-0.1 Et/cont {token}")
+                for name, body in (("preprint", preprint), ("decisions", decisions)):
+                    start = body.find(token)
+                    later = body.find(other, start + len(token)) if start >= 0 else -1
+                    window = body[start:later] if later > start else body[start:start + 90]
+                    if start < 0 or shown not in window:
+                        problems.append(f"{name} splits {shown} m from flat factor-0.1 Et/cont {token}")
 
     if problems:
         print("\n".join(problems))
