@@ -7,7 +7,7 @@ inside the printed 5 % limit, and only the rise 0.30 m cross has one.
 The beam prints state q = 1e+04 N/m. The preprint and the methods log
 state k = 5/6. The methods log names the X-strut shell mid-span, each panel deflection,
 and each panel's chord and diagonal EA. The methods log names each rung-2
-FE mid-span beside its L/D. The hero alt states the five recorded
+FE mid-span and Timoshenko value beside its L/D. The hero alt states the five recorded
 ratios in that order.
 Does not call CalculiX and does not write them.
 """
@@ -216,6 +216,8 @@ def check_rung2():
             window = decisions[max(0, start - 12):start] if start >= 0 else ""
             if fe not in window:
                 problems.append(f"decisions has no rung-2 FE {fe} mm at L/D {ratio}")
+            if f"{_timo} mm at L/D {ratio}" not in decisions:
+                problems.append(f"decisions has no rung-2 Timoshenko {_timo} mm at L/D {ratio}")
     return problems
 
 
