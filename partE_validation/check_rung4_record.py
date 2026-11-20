@@ -5,6 +5,7 @@ CalculiX and does not write them.
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -141,6 +142,26 @@ def check_rung1():
     return problems
 
 
+def check_hero():
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "docs" / "img" / "hero.json").read_text(encoding="utf-8"))
+    rib = (OUT / "vault_rib.txt").read_text(encoding="utf-8").splitlines()
+    problems = []
+    rows = data.get("rows") or []
+    if len(rows) != 5:
+        problems.append(f"hero.json has {len(rows)} rows, record has 5")
+    for row in rows:
+        line = next((ln for ln in rib if ln.startswith(row["case"])), "")
+        if not line:
+            problems.append(f"vault_rib.txt has no {row['case']}")
+            continue
+        tokens = set(line.split())
+        for key in ("mesh", "t_shell_mm", "t_rib_mm", "area_plan", "Et", "Gt"):
+            if row[key] not in tokens:
+                problems.append(f"{row['case']} {key} {row[key]} is not in vault_rib.txt")
+    return problems
+
+
 def main():
     problems = []
     expected = {"rung4_layouts.txt": 7, "rung4_cross.txt": 2, "rung4_storey.txt": 2}
@@ -152,6 +173,7 @@ def main():
     problems.extend(check_xstrut())
     problems.extend(check_rung2())
     problems.extend(check_rung1())
+    problems.extend(check_hero())
     if problems:
         print("\n".join(problems))
         return 1

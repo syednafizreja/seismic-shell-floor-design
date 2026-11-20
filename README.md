@@ -168,7 +168,7 @@ PYTHONPATH=. python partE_validation/check_alpha_record.py
 PYTHONPATH=. python partE_validation/check_tension_record.py
 ```
 
-`check_rung4_record.py` reads `rung1_unit_cell.txt`, `rung2_deep_beam.txt`, `rung4_layouts.txt`, `rung4_cross.txt`, `rung4_storey.txt` and `xstrut_check.txt`. It recomputes the exact flat stiffness, the rung-2 Timoshenko column, the rung-4 Timoshenko column, and the two X-strut percentages. It does not call CalculiX and it does not write those files.
+`check_rung4_record.py` reads `rung1_unit_cell.txt`, `rung2_deep_beam.txt`, `rung4_layouts.txt`, `rung4_cross.txt`, `rung4_storey.txt`, `xstrut_check.txt` and `docs/img/hero.json`. It recomputes the exact flat stiffness, the rung-2 Timoshenko column, the rung-4 Timoshenko column, and the two X-strut percentages. It checks the five hero rows against `vault_rib.txt`. It does not call CalculiX and it does not write those files.
 
 **3. Figures**
 
