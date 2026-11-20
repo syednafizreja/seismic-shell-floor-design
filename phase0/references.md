@@ -2,10 +2,10 @@
 
 | Reference | Copy / note |
 |---|---|
-| Ismail & Mueller 2021, Eng. Struct. 246, 10.1016/j.engstruct.2021.112955 | **missing**: WANTLIST |
-| Amir & Majdouba 2024, SMO 67(6), 10.1007/s00158-024-03824-9 | Papers/10.1007_s00158-024-03824-9.pdf |
-| Whiteley et al. 2023, Structures, 10.1016/j.istruc.2023.03.116 | Papers/10.1016_j.istruc.2023.03.116.pdf |
-| Oval et al. 2023, Structures, 10.1016/j.istruc.2023.01.063 | Zotero VBGC4CNG |
+| Ismail & Mueller 2021, Eng. Struct. 246, 10.1016/j.engstruct.2021.112955 | Full text not obtained, 20 Nov 2026. The ScienceDirect abstract says 48-64% less embodied energy than an equivalent solid flat slab. |
+| Amir & Majdouba 2024, SMO 67:103, 10.1007/s00158-024-03824-9 | PDF read 20 Nov 2026. Weight 24-57% below regular ribbing. The objective is weight. |
+| Whiteley, Liew, He and Gilbert 2023, Structures 51, 1292-1304, 10.1016/j.istruc.2023.03.116 | PDF read 20 Nov 2026. Abstract: about 40-50% less concrete and steel than flat slabs. Body: simply supported grillage 42% less concrete and 31% less reinforcement; column-supported 51% and 34%. |
+| Oval, Nuh, Costa, Abo Madyan, Orr and Shepherd 2023, Structures 49, 124-138, 10.1016/j.istruc.2023.01.063 | PDF read 20 Nov 2026. Prototype shell 72.8 kgCO2eq/m2 plus 15.5 for the levelled floor, total 88.3. 48% below a 250 mm flat slab. A later scenario in the same paper is 53 kgCO2eq/m2 and 60% below that slab. |
 | Feickert & Mueller 2023, 10.1007/s44150-023-00101-z | Zotero 4W585PD5 |
 | Chiang & Borgart 2021, Eng. Struct. 251 (online 2021), 10.1016/j.engstruct.2021.113514. Actual title: "A form-finding method for membrane shells with radial basis functions" | Papers/10.1016_j.engstruct.2021.113514.pdf. Claim checked in the abstract: "peripheral walls are preferable to allow the membrane shells to carry horizontal loads in various directions" |
 | Jewett & Carstensen 2026, arXiv:2604.22070 (title: Topology optimization for materially efficient reinforced concrete design...) | Papers/2604.22070.pdf |
