@@ -172,9 +172,12 @@ PYTHONPATH=. python partE_validation/check_layout_deltas.py
 PYTHONPATH=. python partE_validation/check_alpha_docs.py
 PYTHONPATH=. python partE_validation/check_vault_bay_record.py
 PYTHONPATH=. python partE_validation/check_reproduce_record.py
+PYTHONPATH=. python partE_validation/check_stress_field.py
 ```
 
 `check_rung4_record.py` reads `rung1_unit_cell.txt`, `rung2_deep_beam.txt`, `rung4_layouts.txt`, `rung4_cross.txt`, `rung4_storey.txt`, `rung4_wlock.txt`, `xstrut_check.txt` and `docs/img/hero.json`. It recomputes the exact flat stiffness, the rung-2 Timoshenko column, the rung-4 Timoshenko column, and the two X-strut percentages. It checks the five hero rows against `vault_rib.txt`. The w-lock print stays a separate fail and does not replace the recorded rung 4. Its bend shares match the bending term of the same formula. It does not call CalculiX and it does not write those files.
+
+`check_stress_field.py` reads `smooth_gravity_stress.dat` and `smooth_gravity_stress_030.dat`. Element 221, points 1 to 4, matches one crown face in the stress-line file, and points 5 to 8 match the other. The 0.75 m print names the same rise 0.60 m gate. The two in-plane stresses on each point agree. It does not call CalculiX and it does not write those files.
 
 **3. Figures**
 
