@@ -1,0 +1,9 @@
+Rung 4 diagnostic: same load and mesh as rung4_storey.txt, but w = 0 on every node.
+The recorded file keeps w free in the interior. This file does not replace it.
+Bay 3.0 m square, mesh 12x12, q = 1e+04 N/m. k = 0.833333.
+case                         t mm    Et/ET    Gt/GT     FE mm    Timoshenko mm    error   bend share
+flat, w locked                 60.0  1.00000  1.00000   0.00759   0.00782    -2.93 %   0.303
+rise 0.60, w locked            54.9  0.40784  0.46934   0.00841   0.01743   -51.75 %   0.333
+worst |error| 51.75 %  ->  FAIL (limit 5 %)
+Bend share is the bending term over the Timoshenko total. Shear is the rest.
+Author to confirm k = 5/6, and that locking w is the right comparison for the beam.

@@ -13,7 +13,10 @@ import numpy as np
 
 from partA_mechanics.plate_fe import (
     _shell_sections, faceted_area, grid_on_surface, run_dat, sinusoid_bay)
-from vault_rib import N, T, T_SHELL, rib_thickness
+try:
+    from vault_rib import N, T, T_SHELL, rib_thickness
+except ImportError:
+    from partE_validation.vault_rib import N, T, T_SHELL, rib_thickness
 
 E, NU, RHO, G = 33e9, 0.2, 2500.0, 9.81
 LX = 3.0
