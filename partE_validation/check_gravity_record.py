@@ -6,6 +6,7 @@ those files, and does not read the floor page.
 
 The printed buckling factor is a rounding of the first factor in brackets.
 The number of decimals is the one in the print, so 2789 stands for 2789.003.
+Each crown and face pair has to stay on the same table row as its factor.
 Gravity prints a thickness to hundredths. vault_rib.txt prints the same
 thickness to tenths. Both stay as printed.
 """
@@ -66,6 +67,11 @@ def require(token, docs, label, problems):
     for name, text in docs:
         if token not in text:
             problems.append(f"{label}: {name} has no {token}")
+
+
+def table_row(body, factor):
+    pattern = re.compile(rf"(?<![\d.]){re.escape(factor)}(?![\d.])")
+    return [line for line in body.splitlines() if line.startswith("|") and pattern.search(line)]
 
 
 def row_from(text, label, problems, faces=True):
@@ -211,6 +217,17 @@ def main():
         face_docs = three if faces_in_decisions else both
         for token in parsed["faces"]:
             require(token, face_docs, label + " face", problems)
+        for name, body in both:
+            hits = table_row(body, parsed["factor"])
+            if len(hits) != 1:
+                problems.append(f"{label}: {name} has {len(hits)} table rows for {parsed['factor']}")
+                continue
+            row = hits[0]
+            if parsed["crown"] not in row:
+                problems.append(f"{label}: {name} table row splits the crown from {parsed['factor']}")
+            for token in parsed["faces"]:
+                if token not in row:
+                    problems.append(f"{label}: {name} table row splits {token} from {parsed['factor']}")
         if stiff_text is None:
             continue
         stiff = one(STIFF, stiff_text, label + " stiffness", problems)
