@@ -10,7 +10,9 @@ Each crown and face pair has to stay on the same table row as its factor.
 Where the methods log names a peak deflection, it is the printed largest |w|.
 Gravity prints a thickness to hundredths. vault_rib.txt prints the same
 thickness to tenths. Both stay as printed. The gravity print states
-rho = 2500 kg/m3 and g = 9.81 m/s2.
+rho = 2500 kg/m3 and g = 9.81 m/s2. The methods log names the four
+eigenvalues on the flat plate, the smooth rise 0.60 m bay and the cross,
+in printed order.
 """
 from __future__ import annotations
 
@@ -31,6 +33,8 @@ PEAK = re.compile(r"largest \|w\| (\d+\.\d+) mm")
 SKIP_PEAK = {"flat", "smooth rise 0.60 m", "cross rise 0.60 m"}
 FACTOR = re.compile(
     r"lowest positive buckling factor on self-weight (\d+\.?\d*)\s+factors \[([0-9.]+)")
+SPECTRUM = re.compile(
+    r"lowest positive buckling factor on self-weight \d+\.?\d*\s+factors \[([0-9., ]+)\]")
 FACES = re.compile(
     r"two faces ([+-]?\d+\.\d+e[+-]\d+) Pa and ([+-]?\d+\.\d+e[+-]\d+) Pa")
 GATE = re.compile(
@@ -212,6 +216,24 @@ def main():
         problems.append("decisions no longer states the density and g")
     if "Density 2500 kg/m³." not in preprint:
         problems.append("preprint no longer states the density")
+    spectra = SPECTRUM.findall(bay)
+    if len(spectra) != 3:
+        problems.append(f"gravity_bay.txt has {len(spectra)} eigenvalue lists, record has 3")
+    else:
+        for label, raw in zip(("flat", "smooth", "cross"), spectra):
+            factors = [part.strip() for part in raw.split(",") if part.strip()]
+            if len(factors) != 4:
+                problems.append(f"{label} eigenvalue list has {len(factors)}, record has 4")
+                continue
+            start = decisions.find(f"{label} {factors[0]}")
+            window = decisions[start:start + 70] if start >= 0 else ""
+            cursor = 0
+            for factor in factors:
+                found = window.find(factor, cursor)
+                if found < 0:
+                    problems.append(f"decisions does not keep the {label} eigenvalues in order")
+                    break
+                cursor = found + len(factor)
     both = (("README", readme), ("preprint", preprint))
     three = both + (("decisions", decisions),)
     for label, parsed, faces_in_decisions, stiff_text in records:
