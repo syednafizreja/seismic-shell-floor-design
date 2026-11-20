@@ -1,7 +1,8 @@
 """Check the printed beam arithmetic against the Timoshenko formula.
 
 Reads rung 1, rung 2, the rung-4 files, the w-lock print and the X-strut
-file. Does not call CalculiX and does not write them.
+file. The 1 m panel stays with its printed error and the 0.5 m panel stays
+with its own. Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -83,6 +84,7 @@ def check_xstrut():
     if abs(formula - printed) > TIMO_TOL_M:
         problems.append(f"xstrut Timoshenko {formula / MM:.5f} mm, file {header.group(2)} mm")
     checked = 0
+    pairs = []
     for line in text.splitlines():
         err = re.search(r"([+-]\d+\.\d+)\s+%", line)
         if not err:
@@ -94,9 +96,28 @@ def check_xstrut():
         got = 100.0 * (dx * MM / shell - 1.0)
         if abs(got - float(err.group(1))) > 0.08:
             problems.append(f"xstrut error {got:+.2f} %, file {err.group(1)} %")
+        pairs.append((float(nums[0]), err.group(1).lstrip("+")))
         checked += 1
     if checked != 2:
         problems.append(f"xstrut rows {checked}, record has 2")
+    elif len(pairs) == 2:
+        readme, preprint, decisions = docs()
+        for panel, token in pairs:
+            phrase = "1 m panel" if abs(panel - 1.0) < 1e-9 else "0.5 m"
+            number = re.compile(rf"(?<![\d.]){re.escape(token)}(?![\d.])")
+            for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
+                spots = [match.start() for match in number.finditer(body)]
+                places = []
+                cursor = 0
+                while True:
+                    found = body.find(phrase, cursor)
+                    if found < 0:
+                        break
+                    places.append(found)
+                    cursor = found + len(phrase)
+                gap = min((abs(left - right) for left in spots for right in places), default=None)
+                if gap is None or gap > 48:
+                    problems.append(f"{name} splits the {phrase} from {token} %")
     return problems
 
 
