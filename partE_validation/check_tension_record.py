@@ -59,14 +59,14 @@ def main():
             for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
                 if far.group(1) not in body:
                     problems.append(f"{path.name}: {name} has no farthest centroid {far.group(1)}")
-        elif "still at the four corners" in text:
+        elif path.name == "compression_smooth.txt" and "still at the four corners" in text:
             saw_corners = True
             if "all at the four corners" not in readme or "all at the four corners" not in preprint:
-                problems.append(f"{path.name}: a document no longer keeps those elements at the four corners")
+                problems.append("a document no longer keeps the smooth rise 0.60 m elements at the four corners")
         else:
-            problems.append(f"{path.name} has neither a farthest centroid nor the four-corner sentence")
+            problems.append(f"{path.name} has no farthest centroid")
     if not saw_corners:
-        problems.append("the smooth rise 0.60 m print no longer keeps the tensile elements at the four corners")
+        problems.append("compression_smooth.txt no longer keeps the tensile elements at the four corners")
     if problems:
         print("\n".join(problems))
         return 1
