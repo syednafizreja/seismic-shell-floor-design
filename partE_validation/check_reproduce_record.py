@@ -3,6 +3,7 @@
 The printed columns agree exactly. The file also records a smaller unrounded
 difference, and that token has to stay in the README and the methods log.
 The rib thickness is the gravity print; the rib file rounds it to one decimal.
+The README keeps the generator in the record. Part C and Part D stay not started.
 Does not call CalculiX, does not write either file, and does not read the floor page.
 """
 from __future__ import annotations
@@ -18,6 +19,7 @@ RIB = ROOT / "partE_validation" / "out" / "vault_rib.txt"
 GRAVITY = ROOT / "partE_validation" / "out" / "gravity_bay.txt"
 README = ROOT / "README.md"
 DECISIONS = ROOT / "docs" / "decisions.md"
+PREPRINT = ROOT / "docs" / "preprint_v1.md"
 PAIR = re.compile(
     r"^(smooth|cross)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s*$")
 THICK = re.compile(r"rib thickness (\d+\.\d+) mm\. Largest absolute difference ([0-9.e+-]+)\.")
@@ -58,6 +60,32 @@ def main():
         for name, body in docs:
             if thick.group(2) not in body:
                 problems.append(f"{name} has no generator difference {thick.group(2)}")
+    readme = README.read_text(encoding="utf-8")
+    decisions = DECISIONS.read_text(encoding="utf-8")
+    preprint = PREPRINT.read_text(encoding="utf-8")
+    if "The generator, the building loop and the search are not in this record." in readme:
+        problems.append("README still leaves the generator out of the record")
+    if (
+        "The generator reproduces the recorded bay. "
+        "The building loop and the search are not in this record."
+    ) not in readme:
+        problems.append("README no longer keeps the generator in the record")
+    for row in (
+        "`partB_generator/` | Floor generator | Reproduces the recorded bay.",
+        "`partC_building/` | Whole building | Not started",
+        "`partD_optimise/` | NSGA-II | Not started.",
+    ):
+        if row not in readme:
+            problems.append(f"README folder table lost '{row}'")
+    if (
+        "The generator reproduces this bay. "
+        "The frame design loop and the search are not started."
+    ) not in preprint:
+        problems.append("preprint no longer keeps the generator in and the search out")
+    if "Parts B\u2013D are marked not started" in decisions or "private repository" in decisions:
+        problems.append("the methods log still marks Part B as not started or the repository as private")
+    if "The generator reproduces the recorded bay. Part C and Part D are not started." not in decisions:
+        problems.append("the methods log no longer keeps Part C and Part D not started")
     if problems:
         print("\n".join(problems))
         return 1
