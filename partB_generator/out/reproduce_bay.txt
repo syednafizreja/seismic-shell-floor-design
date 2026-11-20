@@ -1,0 +1,8 @@
+Generator check against partE_validation/out/vault_rib.txt.
+Bay 3.0 m, rise 0.6 m, mesh 21x21. Equal volume to a 60 mm plate.
+case        Et/ET got   Et/ET file   Gt/GT got   Gt/GT file
+smooth       0.40763     0.40763     0.46892     0.46892
+cross        0.38984     0.38984     0.45189     0.45189
+rib thickness 102.53 mm. Largest absolute difference 2.91e-06.
+PASS
+H1 stays open. This check is the recorded cross, not a new layout.

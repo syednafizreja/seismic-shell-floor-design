@@ -1,0 +1,10 @@
+Two diagonals on the sine bay. Linear S8R. Not the recorded cross.
+Bay 3.0 m, rise 0.6 m, mesh 21x21. Shell 50 mm.
+Rib elements 41. Rib thickness 104.77 mm. area/plan 1.0931.
+Author to confirm the diagonals, the half-pitch width and the 50 mm shell.
+No knockdown is applied.
+Et/(E T) 0.39834   Gt/(G T) 0.47168
+crown w -0.0028 mm, largest |w| 0.0045 mm
+lowest positive buckling factor on self-weight 4272.83  factors [4272.828, 4298.179, 4441.859, 5263.539]
+crown sxx, two faces -1.478991e+04 Pa and -1.460445e+04 Pa. Negative is compression.
+H1 stays open. One diagonal pair is not the ribbed floor.

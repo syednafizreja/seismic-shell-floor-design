@@ -25,7 +25,7 @@ In-plane stiffness of one vault bay, the diaphragm ratio of that stiffness on th
 
 | Recorded | Not in this record |
 |---|---|
-| Rungs 1 and 2. Smooth bay. One rib cross. A joint strip. Timoshenko K_d. alpha* on the anchor frame. Gravity on the 3 m bay | Other rib layouts, the X-strut within 5 %, generator, building loop, NSGA-II |
+| Rungs 1 and 2. Smooth bay. One rib cross. Two diagonals. A joint strip. Timoshenko K_d for the flat plate. alpha* on the anchor frame. Gravity on the 3 m bay | Principal-stress ribs, the X-strut within 5 %, the building loop, NSGA-II |
 
 The figure is the equal-volume comparison, Et/(E T) and Gt/(G T), with T = 60 mm. [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt). Plotted values: [docs/img/hero.json](docs/img/hero.json).
 
@@ -39,6 +39,8 @@ The figure is the equal-volume comparison, Et/(E T) and Gt/(G T), with T = 60 mm
 | Cross, rise 0.60 m | 21×21 | 50.0 | 102.5 | 1.0931 | 0.38984 | 0.45189 | |
 
 At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. At rise 0.30 m those ratios are 0.92757 and 0.91777. On the flat plate they are 0.94989 and 0.89831.
+
+Two diagonals on the same rise and the same volume, shell 50 mm, rib 104.77 mm, 41 elements: Et/(E T) 0.39834 and Gt/(G T) 0.47168. [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt). The generator reproduces the recorded smooth shell and the cross to 2.91e-06. [partB_generator/out/reproduce_bay.txt](partB_generator/out/reproduce_bay.txt). *Author to confirm the diagonals.*
 
 The earlier mesh table uses another ratio. Et/(E t) there divides by the thickness in the row, not by 60 mm. For the 16×16 equal-volume row at rise 0.60 m, 0.44562 / 1.0930 = 0.40770, beside 0.40763 on the 21×21 mesh. [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt).
 
@@ -107,8 +109,9 @@ K_f of the ground storey, beam inertia factor 2.0, is 1.174970×10⁸ N/m. Two f
 | Flat, 60 mm | −0.7956 | 25122.1 | +5.701984×10⁵ and −5.701984×10⁵ |
 | Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
 | Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
+| Diagonals, rise 0.60 m | −0.0028 | 4272.83 | −1.478991×10⁴ and −1.460445×10⁴ |
 
-[partE_validation/out/gravity_bay.txt](partE_validation/out/gravity_bay.txt). Rotations on the boundary are free. Density 2500 kg/m³. No knockdown. *Author to confirm the support and the density.*
+The first three rows are [partE_validation/out/gravity_bay.txt](partE_validation/out/gravity_bay.txt). The diagonal row is [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt). Rotations on the boundary are free. Density 2500 kg/m³. No knockdown. *Author to confirm the support and the density.*
 
 | Joint factor 0.1, flat 60 mm | Strip width | Et / continuous |
 |---|---:|---:|
@@ -215,6 +218,7 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | Choices still to confirm | [docs/decisions.md](docs/decisions.md) |
 | The smooth-bay mesh record | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
 | The rib cross | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
+| Two diagonals, and the generator check | [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt), [reproduce_bay.txt](partB_generator/out/reproduce_bay.txt) |
 | alpha*, the joint strip, gravity | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt), [joint_stiffness.txt](partE_validation/out/joint_stiffness.txt), [gravity_bay.txt](partE_validation/out/gravity_bay.txt) |
 | Preprint v1 | [docs/preprint_v1.md](docs/preprint_v1.md) |
 | The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py), [reduced.py](partA_mechanics/reduced.py) |
@@ -223,7 +227,7 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | Folder | Brief part | State |
 |---|---|---|
 | `partA_mechanics/` | Unit cell, vault bay, reduced diaphragm | Solver, Timoshenko K_d, X-strut grid |
-| `partB_generator/` | Floor generator | Not started |
+| `partB_generator/` | Floor generator | Reproduces the recorded bay. Two diagonals are in the record. Principal-stress ribs are not |
 | `partC_building/` | Whole building | Not started |
 | `partD_optimise/` | NSGA-II | Not started. The brief forbids it before the rungs pass |
 | `partE_validation/` | Rungs 1–8 | Rungs 1, 2 and the deflection half of 4. Joint strip, gravity, alpha* |

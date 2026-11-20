@@ -21,8 +21,9 @@ Stiffness is the plan membrane stiffness under three affine strains. Linear stat
 | Cross, rise 0.30 m | 0.43480 | 0.60185 |
 | Smooth, rise 0.60 m | 0.40763 | 0.46892 |
 | Cross, rise 0.60 m | 0.38984 | 0.45189 |
+| Diagonals, rise 0.60 m | 0.39834 | 0.47168 |
 
-Source: `partE_validation/out/vault_rib.txt`, mesh 21×21. At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. H1 stays open. One cross is not the ribbed floor.
+Source for the first five rows: `partE_validation/out/vault_rib.txt`, mesh 21×21. The diagonal row is `partB_generator/out/diagonal_bay.txt`, 41 elements, rib 104.77 mm, shell 50 mm. At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. The diagonals stay under the flat plate. Their shear ratio is above the smooth shell. H1 stays open. One cross and one diagonal pair are not the ribbed floor.
 
 The diaphragm ratio is alpha = K_d / K_f. K_d is the simply-supported Timoshenko stiffness of one bay, with the cell Et and Gt, and k = 5/6 as in the deep-beam check. K_f is the ground-storey stiffness of one anchor transverse frame: 1.174970×10⁸ N/m, height 4.55 m, beam inertia factor 2.0, C40 with E = 32.5 GPa and 600 mm columns, taken from the ShellBench anchor and not re-derived here. The author confirms the storey.
 
@@ -49,8 +50,9 @@ Gravity uses the same 21×21 mesh. Boundary translations are fixed and rotations
 | Flat, 60 mm | −0.7956 | 25122.1 | +5.701984×10⁵ and −5.701984×10⁵ |
 | Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
 | Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
+| Diagonals, rise 0.60 m | −0.0028 | 4272.83 | −1.478991×10⁴ and −1.460445×10⁴ |
 
-The flat crown bends. The vault crown is in compression on both faces. The cross does not lift the buckling factor by much, and it does not cut the crown deflection. Source: `partE_validation/out/gravity_bay.txt`.
+The flat crown bends. The vault crown is in compression on both faces. The cross does not cut the crown deflection. The diagonals do not either, and their factor is 4272.83. The first three rows are `partE_validation/out/gravity_bay.txt`. The diagonal row is `partB_generator/out/diagonal_bay.txt`.
 
 A joint is a centreline strip whose modulus is the factor times E. Factor 1 is the continuous floor. At factor 0.1 the flat plate keeps 0.58615 of its extensional stiffness on a strip 0.333 m wide, and 0.68666 on a strip 0.200 m wide. The width is the element width. The author confirms the strip. Source: `partE_validation/out/joint_stiffness.txt`.
 
@@ -68,4 +70,4 @@ The 5 % figure is the brief's rung-4 limit. It is not a code clause. The Timoshe
 
 ## What this version does not show
 
-There is no optimum shape and no saving in whole-building carbon. The generator, the frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross and one joint strip are not a segmented floor.
+There is no optimum shape and no saving in whole-building carbon. The generator, the frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross, one diagonal pair and one joint strip are not a segmented floor.
