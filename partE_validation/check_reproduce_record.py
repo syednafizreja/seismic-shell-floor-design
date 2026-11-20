@@ -3,7 +3,9 @@
 The printed columns agree exactly. The file also records a smaller unrounded
 difference, and that token has to stay in the README and the methods log.
 The rib thickness is the gravity print; the rib file rounds it to one decimal.
-The README keeps the generator in the record. Part C and Part D stay not started.
+The README keeps the generator in the record. Part C and Part D stay not started,
+and those folders contain only .gitkeep. The X-strut within 5 %, the building
+loop and NSGA-II stay out of the record. H1 stays open.
 Does not call CalculiX, does not write either file, and does not read the floor page.
 """
 from __future__ import annotations
@@ -86,6 +88,14 @@ def main():
         problems.append("the methods log still marks Part B as not started or the repository as private")
     if "The generator reproduces the recorded bay. Part C and Part D are not started." not in decisions:
         problems.append("the methods log no longer keeps Part C and Part D not started")
+    for folder in ("partC_building", "partD_optimise"):
+        names = sorted(path.name for path in (ROOT / folder).iterdir())
+        if names != [".gitkeep"]:
+            problems.append(f"{folder} is no longer only .gitkeep")
+    if "The X-strut within 5 %, the building loop, NSGA-II" not in readme:
+        problems.append("README no longer keeps the X-strut, the building loop and NSGA-II out of the record")
+    if "None of these layouts closes H1" not in readme:
+        problems.append("README no longer leaves H1 open")
     if problems:
         print("\n".join(problems))
         return 1
