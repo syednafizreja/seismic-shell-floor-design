@@ -3,8 +3,9 @@
 Reads vault_rib.txt and the diagonal and stress-line prints. The cross ratio
 is Et and Gt of the cross divided by the smooth shell at that rise. A layout
 gap is the smooth shell minus that layout. Five-decimal rounding of those
-stiffnesses can move a ratio by one in the last place. Does not call CalculiX,
-does not write the files, and does not read the floor page.
+stiffnesses can move a ratio by one in the last place. Each smooth and cross
+Et stays on the same table row as its Gt. Does not call CalculiX, does not
+write the files, and does not read the floor page.
 """
 from __future__ import annotations
 
@@ -45,6 +46,18 @@ LINE_DOCS = {
     "stress_rib_075.txt": ("README", "decisions"),
     "stress_rib_rise030.txt": ("decisions",),
 }
+RIB_LABELS = {
+    ("smooth", "0.00"): ("Smooth, rise 0 |", False),
+    ("cross", "0.00"): ("Cross, rise 0 |", False),
+    ("smooth", "0.30"): ("Smooth, rise 0.30 m |", True),
+    ("cross", "0.30"): ("Cross, rise 0.30 m |", True),
+    ("smooth", "0.60"): ("Smooth, rise 0.60 m |", True),
+    ("cross", "0.60"): ("Cross, rise 0.60 m |", True),
+}
+
+
+def has_token(line, token):
+    return re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", line) is not None
 
 
 def gap(left, right):
@@ -120,6 +133,26 @@ def main():
             for phrase in expected:
                 if phrase not in texts[name]:
                     problems.append(f"{name} has no '{phrase}'")
+        for key, (label, in_preprint) in RIB_LABELS.items():
+            et, gt, area = rows[key]["et"], rows[key]["gt"], rows[key]["area"]
+            bodies = [("README", readme)]
+            if in_preprint:
+                bodies.append(("preprint", preprint))
+            for name, body in bodies:
+                hits = [
+                    line for line in body.splitlines()
+                    if line.startswith("|") and label in line and has_token(line, et)
+                ]
+                if not hits:
+                    problems.append(f"{name} has no {label} row with {et}")
+                    continue
+                for line in hits:
+                    if not has_token(line, gt):
+                        problems.append(f"{name} splits {gt} from {et} on {label}")
+                if name == "README":
+                    mesh = [line for line in hits if "21×21" in line or "21x21" in line]
+                    if len(mesh) != 1 or not has_token(mesh[0], area):
+                        problems.append(f"README splits area/plan {area} from {et} on {label}")
 
     layouts = (
         ("diagonal_rise030.txt", "0.30", "pair", "split"),
