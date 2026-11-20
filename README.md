@@ -270,7 +270,7 @@ There is no archived release and no DOI. Cite the code and the record as:
 
 Syed Nafiz Reja Hasib, civil and structural engineer. [ORCID 0009-0002-7162-7890](https://orcid.org/0009-0002-7162-7890).
 
-This repository is the record of one vault bay: its in-plane stiffness, a diaphragm ratio on the anchor spans, and gravity on that bay. There is no carbon optimum and no search. The question is fixed in [brief.md](brief.md). Every number above is taken from a file named beside it.
+This repository is the record of one vault bay: its in-plane stiffness, a diaphragm ratio on the anchor spans, and gravity on that bay. There is no carbon optimum and no search. The question is fixed in [brief.md](brief.md). Every number above is taken from a file named beside it. An OpenAlex search on 20 Nov 2026 found no paper that designs a concrete shell floor for in-plane seismic shear in a multi-storey frame. Scopus and Web of Science were not searched. The queries and the neighbours are in [phase0/gap.md](phase0/gap.md).
 
 The public page states the same record and does not link this repository: [seismic shell floors](https://syednafizreja.github.io/work/seismic-shell-floors/).
 
