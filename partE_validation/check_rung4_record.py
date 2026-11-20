@@ -5,8 +5,9 @@ file. The 1 m panel stays with its printed error and the 0.5 m panel stays
 with its own. The seven layout errors stay in the file order. A PASS mark has to sit
 inside the printed 5 % limit, and only the rise 0.30 m cross has one.
 The beam prints state q = 1e+04 N/m. The preprint and the methods log
-state k = 5/6. The methods log names the X-strut shell mid-span and each
-panel deflection. The hero alt states the five recorded ratios in that order.
+state k = 5/6. The methods log names the X-strut shell mid-span, each panel deflection,
+and each panel's chord and diagonal EA. The hero alt states the five recorded
+ratios in that order.
 Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
@@ -101,13 +102,13 @@ def check_xstrut():
         got = 100.0 * (dx * MM / shell - 1.0)
         if abs(got - float(err.group(1))) > 0.08:
             problems.append(f"xstrut error {got:+.2f} %, file {err.group(1)} %")
-        pairs.append((float(nums[0]), err.group(1).lstrip("+"), nums[-1]))
+        pairs.append((float(nums[0]), err.group(1).lstrip("+"), nums[-1], nums[1], nums[2]))
         checked += 1
     if checked != 2:
         problems.append(f"xstrut rows {checked}, record has 2")
     elif len(pairs) == 2:
         readme, preprint, decisions = docs()
-        for panel, token, _dx in pairs:
+        for panel, token, _dx, _chord, _diagonal in pairs:
             phrase = "1 m panel" if abs(panel - 1.0) < 1e-9 else "0.5 m"
             number = re.compile(rf"(?<![\d.]){re.escape(token)}(?![\d.])")
             for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
@@ -128,7 +129,7 @@ def check_xstrut():
         if shell_token not in decisions or timo_token not in decisions:
             problems.append(
                 f"decisions has no X-strut shell {shell_token} mm or Timoshenko {timo_token} mm")
-        for panel, _token, dx in pairs:
+        for panel, _token, dx, _chord, _diagonal in pairs:
             phrase = "1 m panel" if abs(panel - 1.0) < 1e-9 else "0.5 m"
             spots = [
                 match.start() for match in re.finditer(
@@ -145,7 +146,14 @@ def check_xstrut():
             gap = min((abs(left - right) for left in spots for right in places), default=None)
             if gap is None or gap > 40:
                 problems.append(f"decisions splits the {phrase} from X-strut deflection {dx} mm")
-        largest = max(abs(float(token)) for _, token, _dx in pairs)
+        for panel, _token, _dx, chord, diagonal in pairs:
+            anchor = "1 m panel deflects" if abs(panel - 1.0) < 1e-9 else "0.5 m panel deflects"
+            start = decisions.find(anchor)
+            window = decisions[start:start + 110] if start >= 0 else ""
+            if chord not in window or diagonal not in window:
+                problems.append(
+                    f"decisions splits {anchor} from chord EA {chord} or diagonal EA {diagonal}")
+        largest = max(abs(float(token)) for _, token, _dx, _chord, _diagonal in pairs)
         summary = (
             f"largest |error| {largest:.2f} %  ->  FAIL "
             "(limit 5 %, the brief's rung-4 deflection limit)"
