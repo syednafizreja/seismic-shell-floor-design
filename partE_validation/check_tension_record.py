@@ -1,4 +1,4 @@
-"""The documents must name each recorded tensile count, largest principal and reach.
+"""The documents must name each recorded tensile count, largest principal, smallest principal and reach.
 
 Reads the compression prints, README.md, the preprint and the methods log.
 The smooth rise 0.60 m print has no farthest-centroid line: those elements
@@ -17,6 +17,7 @@ PREPRINT = ROOT / "docs" / "preprint_v1.md"
 DECISIONS = ROOT / "docs" / "decisions.md"
 COUNT = re.compile(r"With a tensile principal (\d+)\.")
 LARGE = re.compile(r"Largest principal ([0-9.]+)e[+-]\d+")
+SMALL = re.compile(r"Smallest principal -([0-9.]+)e[+-]\d+")
 FAR = re.compile(r"Farthest tensile centroid from a plan corner (\d+\.\d+) m")
 
 
@@ -48,6 +49,11 @@ def main():
                 problems.append(f"{path.name}: {name} has no {mantissa}")
         if mantissa not in decisions:
             problems.append(f"{path.name}: decisions has no {mantissa}")
+        small = SMALL.search(text)
+        if not small:
+            problems.append(f"{path.name} has no smallest principal")
+        elif small.group(1) not in decisions:
+            problems.append(f"{path.name}: decisions has no smallest principal {small.group(1)}")
         far = FAR.search(text)
         if far:
             for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
