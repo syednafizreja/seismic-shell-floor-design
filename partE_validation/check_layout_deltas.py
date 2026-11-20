@@ -5,7 +5,8 @@ is Et and Gt of the cross divided by the smooth shell at that rise. A layout
 gap is the smooth shell minus that layout. Five-decimal rounding of those
 stiffnesses can move a ratio by one in the last place. Each smooth and cross
 Et stays on the same table row as its Gt. The H1 row keeps those stiffnesses
-and stays open. Does not call CalculiX, does not
+and stays open. The key finding states the recorded rise 0.60 m ratios.
+Does not call CalculiX, does not
 write the files, and does not read the floor page.
 """
 from __future__ import annotations
@@ -249,6 +250,14 @@ def main():
         for et, gt in pairs:
             if not has_token(h1, et) or not has_token(h1, gt):
                 problems.append(f"the H1 row splits {et} from {gt}")
+    finding = (
+        "One rib cross stays below the smooth shell. At rise 0.60 m, "
+        f"Et/(E T) is {rows[('cross', '0.60')]['et']} on the cross and "
+        f"{rows[('smooth', '0.60')]['et']} on the smooth shell. "
+        f"The flat plate is {rows[('smooth', '0.00')]['et']}."
+    )
+    if finding not in readme:
+        problems.append("the key finding no longer states the recorded rise 0.60 m ratios")
 
     if problems:
         print("\n".join(problems))
