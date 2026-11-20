@@ -6,6 +6,7 @@ gap is the smooth shell minus that layout. Five-decimal rounding of those
 stiffnesses can move a ratio by one in the last place. Each smooth and cross
 Et stays on the same table row as its Gt. The H1 row keeps those stiffnesses
 and stays open. The key finding states the recorded rise 0.60 m ratios.
+The preprint stiffness table keeps each layout's Et with its Gt.
 Does not call CalculiX, does not
 write the files, and does not read the floor page.
 """
@@ -258,6 +259,26 @@ def main():
     )
     if finding not in readme:
         problems.append("the key finding no longer states the recorded rise 0.60 m ratios")
+    table = [(rows[("smooth", "0.00")]["et"], rows[("smooth", "0.00")]["gt"], "Flat plate |")]
+    for label, filename in (
+        ("Diagonals, rise 0.30 m |", "diagonal_rise030.txt"),
+        ("Stress lines, rise 0.30 m, 0.375 m |", "stress_rib_rise030.txt"),
+        ("Diagonals, rise 0.60 m |", "diagonal_bay.txt"),
+        ("Stress lines, 0.375 m |", "stress_rib.txt"),
+        ("Stress lines, 0.75 m |", "stress_rib_075.txt"),
+    ):
+        stiff = STIFF.search((BOUT / filename).read_text(encoding="utf-8"))
+        if not stiff:
+            problems.append(f"{filename} has no Et, Gt line")
+            continue
+        table.append((stiff.group(1), stiff.group(2), label))
+    for et, gt, label in table:
+        hits = [
+            line for line in preprint.splitlines()
+            if line.startswith("|") and label in line and has_token(line, et)
+        ]
+        if len(hits) != 1 or not has_token(hits[0], gt):
+            problems.append(f"preprint splits {et} from {gt} on {label}")
 
     if problems:
         print("\n".join(problems))
