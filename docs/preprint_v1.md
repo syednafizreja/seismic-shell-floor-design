@@ -22,8 +22,9 @@ Stiffness is the plan membrane stiffness under three affine strains. Linear stat
 | Smooth, rise 0.60 m | 0.40763 | 0.46892 |
 | Cross, rise 0.60 m | 0.38984 | 0.45189 |
 | Diagonals, rise 0.60 m | 0.39834 | 0.47168 |
+| Stress lines, rise 0.60 m | 0.40744 | 0.46840 |
 
-Source for the first five rows: `partE_validation/out/vault_rib.txt`, mesh 21×21. The diagonal row is `partB_generator/out/diagonal_bay.txt`, 41 elements, rib 104.77 mm, shell 50 mm. At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. The diagonals stay under the flat plate. Their shear ratio is above the smooth shell. H1 stays open. One cross and one diagonal pair are not the ribbed floor.
+Source for the first five rows: `partE_validation/out/vault_rib.txt`, mesh 21×21. The diagonal row is `partB_generator/out/diagonal_bay.txt`, 41 elements, rib 104.77 mm, shell 50 mm. The stress-line row is `partB_generator/out/stress_rib.txt`, spacing 0.375 m, 236 elements, rib 59.16 mm, shell 50 mm. At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369 in shear. The diagonals stay under the flat plate. Their shear ratio is above the smooth shell. The stress-line ratios are 0.00019 and 0.00052 below the smooth shell, because the lines cover 236 of 441 elements. H1 stays open. One cross, one diagonal pair and one stress-line layout are not the ribbed floor.
 
 The diaphragm ratio is alpha = K_d / K_f. K_d is the simply-supported Timoshenko stiffness of one bay, with the cell Et and Gt, and k = 5/6 as in the deep-beam check. K_f is the ground-storey stiffness of one anchor transverse frame: 1.174970×10⁸ N/m, height 4.55 m, beam inertia factor 2.0, C40 with E = 32.5 GPa and 600 mm columns, taken from the ShellBench anchor and not re-derived here. The author confirms the storey.
 
@@ -51,8 +52,9 @@ Gravity uses the same 21×21 mesh. Boundary translations are fixed and rotations
 | Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
 | Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
 | Diagonals, rise 0.60 m | −0.0028 | 4272.83 | −1.478991×10⁴ and −1.460445×10⁴ |
+| Stress lines, rise 0.60 m | −0.0022 | 5012.74 | −2.022574×10⁴ and −1.691824×10⁴ |
 
-The flat crown bends. The vault crown is in compression on both faces. The cross does not cut the crown deflection. The diagonals do not either, and their factor is 4272.83. The first three rows are `partE_validation/out/gravity_bay.txt`. The diagonal row is `partB_generator/out/diagonal_bay.txt`.
+The flat crown bends. The vault crown is in compression on both faces. The cross does not cut the crown deflection. The diagonals do not either, and their factor is 4272.83. The stress-line crown deflection matches the smooth shell, and the factor is 5012.74. The first three rows are `partE_validation/out/gravity_bay.txt`. The diagonal row is `partB_generator/out/diagonal_bay.txt`. The stress-line row is `partB_generator/out/stress_rib.txt`.
 
 A joint is a centreline strip whose modulus is the factor times E. Factor 1 is the continuous floor. At factor 0.1 the flat plate keeps 0.58615 of its extensional stiffness on a strip 0.333 m wide, and 0.68666 on a strip 0.200 m wide. The width is the element width. The author confirms the strip. Source: `partE_validation/out/joint_stiffness.txt`.
 
@@ -70,4 +72,4 @@ The 5 % figure is the brief's rung-4 limit. It is not a code clause. The Timoshe
 
 ## What this version does not show
 
-There is no optimum shape and no saving in whole-building carbon. The generator, the frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross, one diagonal pair and one joint strip are not a segmented floor.
+There is no optimum shape and no saving in whole-building carbon. The generator reproduces this bay. The frame design loop and the search are not started. Rungs 3 and 5 stay in ShellBench until that loop exists. The diaphragm model is one linear storey on springs. Cracking, a topping and a tie are not in the run. One cross, one diagonal pair, one stress-line layout and one joint strip are not a segmented floor.
