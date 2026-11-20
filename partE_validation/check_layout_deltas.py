@@ -4,7 +4,8 @@ Reads vault_rib.txt and the diagonal and stress-line prints. The cross ratio
 is Et and Gt of the cross divided by the smooth shell at that rise. A layout
 gap is the smooth shell minus that layout. Five-decimal rounding of those
 stiffnesses can move a ratio by one in the last place. Each smooth and cross
-Et stays on the same table row as its Gt. Does not call CalculiX, does not
+Et stays on the same table row as its Gt. The H1 row keeps those stiffnesses
+and stays open. Does not call CalculiX, does not
 write the files, and does not read the floor page.
 """
 from __future__ import annotations
@@ -57,7 +58,7 @@ RIB_LABELS = {
 
 
 def has_token(line, token):
-    return re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", line) is not None
+    return re.search(rf"(?<!\d){re.escape(token)}(?!\d)", line) is not None
 
 
 def gap(left, right):
@@ -224,6 +225,30 @@ def main():
             found = pattern.search(text)
             if found and found.group(1) not in decisions:
                 problems.append(f"decisions has no {found.group(1)} from {filename}")
+
+    h1 = next((line for line in readme.splitlines() if "None of these layouts closes H1" in line), "")
+    if "Open." not in h1:
+        problems.append("the H1 row no longer stays open")
+    else:
+        pairs = [
+            (rows[("smooth", "0.60")]["et"], rows[("smooth", "0.60")]["gt"]),
+            (rows[("cross", "0.60")]["et"], rows[("cross", "0.60")]["gt"]),
+        ]
+        for filename in (
+            "diagonal_rise030.txt",
+            "stress_rib_rise030.txt",
+            "diagonal_bay.txt",
+            "stress_rib.txt",
+            "stress_rib_075.txt",
+        ):
+            stiff = STIFF.search((BOUT / filename).read_text(encoding="utf-8"))
+            if not stiff:
+                problems.append(f"{filename} has no Et, Gt line")
+                continue
+            pairs.append((stiff.group(1), stiff.group(2)))
+        for et, gt in pairs:
+            if not has_token(h1, et) or not has_token(h1, gt):
+                problems.append(f"the H1 row splits {et} from {gt}")
 
     if problems:
         print("\n".join(problems))
