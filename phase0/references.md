@@ -11,5 +11,6 @@
 | Jewett & Carstensen 2026, arXiv:2604.22070 (title: Topology optimization for materially efficient reinforced concrete design...) | Papers/2604.22070.pdf |
 | Kotronis & Grange 2010, EJECE 14(6-7) | **unresolved**: no OpenAlex match; author to give the title/DOI |
 | Micelli et al. 2014, equivalent diaphragms | **unresolved**: as above |
-| Ranaudo 2021 (HiLo), Terazawa 2022, Wehner & Ismail 2025 | not yet looked up (Phase 0) |
+| Ranaudo 2021 (HiLo), Terazawa 2022 | not yet looked up (Phase 0) |
+| Wehner & Ismail 2025, DOI 10.1201/9781003658641-75, printed pages 621-628 | Open-access PDF read 20 Nov 2026. Cost framework. It does not define unique segments or formwork area. Pf is left unquantified. |
 | EN 1998-1 cl. 4.3.1(4) | code text: author's copy |

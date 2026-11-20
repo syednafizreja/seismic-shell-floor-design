@@ -239,6 +239,7 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | Principal-stress ribs | [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt), [stress_rib_075.txt](partB_generator/out/stress_rib_075.txt), [stress_rib_rise030.txt](partB_generator/out/stress_rib_rise030.txt) |
 | alpha*, the joint strip, gravity | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt), [joint_stiffness.txt](partE_validation/out/joint_stiffness.txt), [gravity_bay.txt](partE_validation/out/gravity_bay.txt), [gravity_rise030.txt](partE_validation/out/gravity_rise030.txt) |
 | Preprint v1 | [docs/preprint_v1.md](docs/preprint_v1.md) |
+| The constructability measure | [docs/decisions.md](docs/decisions.md). Wehner and Ismail 2025 does not define unique segments or formwork area, so no number is computed |
 | The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py), [reduced.py](partA_mechanics/reduced.py) |
 | The figure scripts | [scripts/readme_hero.py](scripts/readme_hero.py), [scripts/alpha_fig.py](scripts/alpha_fig.py) |
 
