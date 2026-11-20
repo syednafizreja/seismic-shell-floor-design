@@ -3,6 +3,8 @@
 The 16×16 equal-volume row at rise 0.60 m prints Et/(E t). Dividing by
 area/plan converts it to Et/(E T) for the flat 60 mm plate. Each of the
 thirteen README rows keeps its thickness, area/plan, Et and Gt together.
+The named prints state E = 3.3e+10 Pa and nu = 0.2. The README and the
+preprint state C30/37, E = 33 GPa and nu = 0.2.
 Does not call CalculiX, does not write the file, and does not read the floor page.
 """
 from __future__ import annotations
@@ -75,6 +77,21 @@ def main():
     readme = README.read_text(encoding="utf-8")
     preprint = PREPRINT.read_text(encoding="utf-8")
     decisions = DECISIONS.read_text(encoding="utf-8")
+    material = "E = 3.3e+10 Pa, nu = 0.2"
+    for name in (
+        "vault_bay.txt",
+        "vault_rib.txt",
+        "rung1_unit_cell.txt",
+        "rung2_deep_beam.txt",
+        "joint_stiffness.txt",
+        "xstrut_check.txt",
+    ):
+        if material not in (OUT.parent / name).read_text(encoding="utf-8"):
+            problems.append(f"{name} no longer states E = 3.3e+10 Pa and nu = 0.2")
+    if "C30/37, E = 33 GPa, ν = 0.2, reference thickness 60 mm" not in readme:
+        problems.append("README no longer states C30/37, E = 33 GPa and nu = 0.2")
+    if "C30/37, E = 33 GPa and ν = 0.2" not in preprint:
+        problems.append("preprint no longer states C30/37, E = 33 GPa and nu = 0.2")
     for row in rows.values():
         for token in row.values():
             require(token, (("README", readme),), "mesh row", problems)
