@@ -1,0 +1,9 @@
+Rung 4 deflection on the recorded 21x21 mesh. This file does not replace rung4_storey.txt.
+Bay 3.0 m square, rise 0.6 m, mesh 21x21, q = 1e+04 N/m. Limit 5 % from the brief.
+The in-plane load totals q L. Vertical displacement is held on the plan boundary.
+Smooth shell 54.89 mm. Cross shell 50.0 mm, rib 102.53 mm, one element wide.
+case        Et/(E T)  Gt/(G T)    FE mm   Timoshenko mm    error
+smooth       0.40763   0.46892   0.02011   0.01744   +15.33 %  FAIL
+cross        0.38984   0.45189   0.02386   0.01814   +31.53 %  FAIL
+The 12x12 smooth bay stays +15.80 % in rung4_storey.txt. The 38.4 m floor is not in this check.
+Author to confirm the cross on this check.

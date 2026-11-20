@@ -152,6 +152,7 @@ PYTHONPATH=. python partE_validation/vault_rib.py
 PYTHONPATH=. python partE_validation/joint_stiffness.py
 PYTHONPATH=. python partE_validation/xstrut_check.py
 PYTHONPATH=. python partE_validation/rung4_storey.py
+PYTHONPATH=. python partE_validation/rung4_cross.py
 PYTHONPATH=. python partE_validation/gravity_bay.py
 PYTHONPATH=. python partE_validation/alpha_star.py
 ```
@@ -216,7 +217,7 @@ Drawn from `partE_validation/out/vault_rib.txt` by [scripts/readme_hero.py](scri
 | Rung 2. Deep beam against Timoshenko | 2 % | PASS. Worst error 0.21 %. Shear share 3.5 % to 36.5 % | [partE_validation/out/rung2_deep_beam.txt](partE_validation/out/rung2_deep_beam.txt) |
 | Rise zero against the flat cell | 0.1 % | PASS. Et 1.684e-06 %, Gt 1.155e-12 % | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
 | Smooth rise 0 on the rib mesh | exact E T | 1.00000 and 1.00000. The cross has no pass mark | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
-| Rung 4. Shell deep beam against its own Et, Gt, 3 m bay | 5 % | Flat −2.93 %, pass. Rise 0.60 m +15.80 %, fail | [partE_validation/out/rung4_storey.txt](partE_validation/out/rung4_storey.txt) |
+| Rung 4. Shell deep beam against its own Et, Gt, 3 m bay | 5 % | Flat −2.93 %, pass. Rise 0.60 m on 12×12 +15.80 %, fail. On 21×21 the smooth shell is +15.33 % and the cross is +31.53 %. Both fail | [partE_validation/out/rung4_storey.txt](partE_validation/out/rung4_storey.txt), [rung4_cross.txt](partE_validation/out/rung4_cross.txt) |
 | X-strut, calibrated on Et and Gt, checked on the 12 m deep beam | 5 % | 1 m panel +9.83 %. 0.5 m panel +12.74 %. Both fail | [partE_validation/out/xstrut_check.txt](partE_validation/out/xstrut_check.txt) |
 | Two-frame alpha* | 20, from the definition of K_d | 19.9956. Beam element −0.003 % | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt) |
 
