@@ -28,6 +28,23 @@ CASE = re.compile(
 RATIO = re.compile(r"Et_cross/Et_smooth (\d+\.\d+), Gt_cross/Gt_smooth (\d+\.\d+)")
 VOLUME = re.compile(r"volume (\d+\.\d+) m3")
 STIFF = re.compile(r"Et/\(E T\) (\d+\.\d+)\s+Gt/\(G T\) (\d+\.\d+)")
+ELEMENTS = re.compile(r"Rib elements (\d+)\.")
+NLINES = re.compile(r"Lines (\d+)\.")
+GAP = re.compile(r"Square-symmetry gap (\d+\.\d+) Pa")
+LENGTH = re.compile(r"Plan length (\d+\.\d+) m")
+# The preprint names elements and not lines. The README names 24 and 12 lines, not 32.
+ELEMENT_STYLE = {
+    "diagonal_bay.txt": {"README": "elements", "preprint": "elements", "decisions": "elements"},
+    "diagonal_rise030.txt": {"README": "elements", "preprint": "elements", "decisions": "elements"},
+    "stress_rib.txt": {"README": "of", "preprint": "elements", "decisions": "of"},
+    "stress_rib_075.txt": {"README": "elements", "preprint": "elements", "decisions": "elements"},
+    "stress_rib_rise030.txt": {"README": "of", "preprint": "elements", "decisions": "of"},
+}
+LINE_DOCS = {
+    "stress_rib.txt": ("README", "decisions"),
+    "stress_rib_075.txt": ("README", "decisions"),
+    "stress_rib_rise030.txt": ("decisions",),
+}
 
 
 def gap(left, right):
@@ -148,6 +165,32 @@ def main():
             problems.append("the preprint no longer says the diagonal shear ratio is above the smooth shell")
         if "Shear is above it" not in decisions:
             problems.append("the methods log no longer says the diagonal shear is above the smooth shell")
+
+    bodies = {"README": readme, "preprint": preprint, "decisions": decisions}
+    for filename, styles in ELEMENT_STYLE.items():
+        text = (BOUT / filename).read_text(encoding="utf-8")
+        count = ELEMENTS.search(text)
+        if not count:
+            problems.append(f"{filename} has no rib-element count")
+            continue
+        n = count.group(1)
+        for doc, style in styles.items():
+            phrase = f"{n} of 441" if style == "of" else f"{n} elements"
+            if phrase not in bodies[doc]:
+                problems.append(f"{doc} has no '{phrase}'")
+        lines = NLINES.search(text)
+        if filename in LINE_DOCS:
+            if not lines:
+                problems.append(f"{filename} has no line count")
+            else:
+                phrase = f"{lines.group(1)} lines"
+                for doc in LINE_DOCS[filename]:
+                    if phrase not in bodies[doc]:
+                        problems.append(f"{doc} has no '{phrase}'")
+        for pattern in (GAP, LENGTH):
+            found = pattern.search(text)
+            if found and found.group(1) not in decisions:
+                problems.append(f"decisions has no {found.group(1)} from {filename}")
 
     if problems:
         print("\n".join(problems))
