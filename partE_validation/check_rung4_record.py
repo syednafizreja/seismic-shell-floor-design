@@ -120,6 +120,13 @@ def check_xstrut():
                 gap = min((abs(left - right) for left in spots for right in places), default=None)
                 if gap is None or gap > 48:
                     problems.append(f"{name} splits the {phrase} from {token} %")
+        largest = max(abs(float(token)) for _, token in pairs)
+        summary = (
+            f"largest |error| {largest:.2f} %  ->  FAIL "
+            "(limit 5 %, the brief's rung-4 deflection limit)"
+        )
+        if summary not in text:
+            problems.append("the X-strut summary is not a fail at the larger printed error")
     return problems
 
 
@@ -294,6 +301,14 @@ def main():
     problems.extend(check_rung2())
     problems.extend(check_rung1())
     problems.extend(check_hero())
+    storey = (OUT / "rung4_storey.txt").read_text(encoding="utf-8")
+    storey_rows = rows(OUT / "rung4_storey.txt")
+    if storey_rows:
+        storey_worst = max(abs(float(row["err"])) for row in storey_rows)
+        if f"worst |error| {storey_worst:.2f} %  ->  FAIL (limit 5 %)" not in storey:
+            problems.append("the 12x12 summary is not a fail at the larger printed error")
+    if "The cross is not in this check. The 38.4 m floor is not in this check." not in storey:
+        problems.append("the 12x12 file no longer leaves out the cross and the 38.4 m floor")
     wlock = (OUT / "rung4_wlock.txt").read_text(encoding="utf-8")
     if "This file does not replace it." not in wlock:
         problems.append("the w-lock print no longer leaves rung4_storey.txt in place")
