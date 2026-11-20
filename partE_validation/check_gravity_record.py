@@ -7,6 +7,7 @@ those files, and does not read the floor page.
 The printed buckling factor is a rounding of the first factor in brackets.
 The number of decimals is the one in the print, so 2789 stands for 2789.003.
 Each crown and face pair has to stay on the same table row as its factor.
+Where the methods log names a peak deflection, it is the printed largest |w|.
 Gravity prints a thickness to hundredths. vault_rib.txt prints the same
 thickness to tenths. Both stay as printed.
 """
@@ -25,6 +26,8 @@ PREPRINT = ROOT / "docs" / "preprint_v1.md"
 DECISIONS = ROOT / "docs" / "decisions.md"
 
 CROWN = re.compile(r"crown w(?: from the existing stress print)? ([+-]?\d+\.\d+) mm")
+PEAK = re.compile(r"largest \|w\| (\d+\.\d+) mm")
+SKIP_PEAK = {"flat", "smooth rise 0.60 m", "cross rise 0.60 m"}
 FACTOR = re.compile(
     r"lowest positive buckling factor on self-weight (\d+\.?\d*)\s+factors \[([0-9.]+)")
 FACES = re.compile(
@@ -82,11 +85,13 @@ def row_from(text, label, problems, faces=True):
     printed, full = factor.group(1), factor.group(2)
     if abs(float(printed) - float(full)) > 0.51 * 10 ** (-places(printed)):
         problems.append(f"{label}: factor {printed} is not the rounded first eigenvalue {full}")
+    peak = one(PEAK, text, label + " peak", problems)
     face = one(FACES, text, label + " faces", problems) if faces else None
     if faces and face is None:
         return None
     return {
         "crown": crown.group(1).lstrip("+-"),
+        "peak": peak.group(1) if peak else "",
         "factor": printed,
         "faces": [mantissa(face.group(1)), mantissa(face.group(2))] if face else [],
         "signed": [float(face.group(1)), float(face.group(2))] if face else [],
@@ -228,6 +233,20 @@ def main():
             for token in parsed["faces"]:
                 if token not in row:
                     problems.append(f"{label}: {name} table row splits {token} from {parsed['factor']}")
+        if label not in SKIP_PEAK and parsed["peak"]:
+            factor_at = [
+                match.start() for match in re.finditer(
+                    rf"(?<!\d){re.escape(parsed['factor'])}(?!\d)", decisions)
+            ]
+            peak_at = [
+                match.start() for match in re.finditer(
+                    rf"(?<!\d){re.escape(parsed['peak'])}(?!\d)", decisions)
+            ]
+            gap = min((abs(left - right) for left in factor_at for right in peak_at), default=None)
+            if gap is None or gap > 90:
+                problems.append(
+                    f"{label}: decisions splits peak {parsed['peak']} from {parsed['factor']}"
+                )
         if stiff_text is None:
             continue
         stiff = one(STIFF, stiff_text, label + " stiffness", problems)
