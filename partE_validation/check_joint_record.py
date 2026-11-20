@@ -5,7 +5,8 @@ and docs/decisions.md. Et/cont and Gt/cont are the same row divided by the
 factor-1 row. The print keeps five decimals, so that quotient can differ from
 the printed continuous ratio by a few hundredths of a thousandth. The flat
 factor-0.1 ratio stays with its strip width. The methods log names the vault
-factor-0.1 Et/(E T), Et/cont, Gt/(G T) and Gt/cont. Does not call CalculiX,
+factor-0.1 Et/(E T), Et/cont, Gt/(G T) and Gt/cont. The methods log
+names each equal-volume vault thickness beside its mesh. Does not call CalculiX,
 does not write the file, and does not read the floor page.
 """
 from __future__ import annotations
@@ -125,6 +126,12 @@ def main():
                 problems.append(f"decisions has no vault factor-0.1 {et60} and {etcont} on {mesh}")
             if gt60 not in decisions or gtcont not in decisions:
                 problems.append(f"decisions has no vault factor-0.1 {gt60} and {gtcont} on {mesh}")
+        labels = {"9x9": "9×9", "15x15": "15×15"}
+        for mesh, mm in THICK.findall(text):
+            start = decisions.find(mm)
+            window = decisions[start:start + 20] if start >= 0 else ""
+            if labels[mesh] not in window:
+                problems.append(f"decisions has no equal-volume thickness {mm} mm on {mesh}")
         if len(flat_pairs) == 2:
             for token, width in flat_pairs:
                 shown = f"{float(width):.3f}"
