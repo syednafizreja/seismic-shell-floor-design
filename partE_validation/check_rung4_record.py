@@ -2,7 +2,8 @@
 
 Reads rung 1, rung 2, the rung-4 files, the w-lock print and the X-strut
 file. The 1 m panel stays with its printed error and the 0.5 m panel stays
-with its own. Does not call CalculiX and does not write them.
+with its own. The seven layout errors stay in the file order. Does not call
+CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -244,6 +245,28 @@ def main():
             problems.append(f"{name}: {len(got)} rows, record has {n}")
         problems.extend(check(OUT / name))
     problems.extend(check_xstrut())
+    layout_rows = rows(OUT / "rung4_layouts.txt")
+    if len(layout_rows) == 7:
+        tokens = [row["err"].lstrip("+-") for row in layout_rows]
+        readme, preprint, decisions = docs()
+        number = lambda token: re.compile(rf"(?<![\d.]){re.escape(token)}(?![\d.])")
+        for name, body in (("README", readme), ("preprint", preprint), ("decisions", decisions)):
+            cursor = 0
+            for token in tokens:
+                match = number(token).search(body, cursor)
+                if not match:
+                    problems.append(f"{name} does not keep layout error {token} in file order")
+                    break
+                cursor = match.end()
+        for phrase in (
+            "12.49 % at rise 0.60 m",
+            "9.38 % at rise 0.30 m",
+            "11.30 % at 0.375 m",
+            "8.58 % at 0.75 m",
+            "13.72 % at rise 0.30 m",
+        ):
+            if phrase not in decisions:
+                problems.append(f"decisions no longer keeps '{phrase}'")
     problems.extend(check_rung2())
     problems.extend(check_rung1())
     problems.extend(check_hero())
