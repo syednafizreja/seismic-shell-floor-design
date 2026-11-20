@@ -4,7 +4,9 @@ Reads alpha_star.txt only. The three sensitivity rows and the two unused frame
 stiffnesses stay in that file. They are not required in the documents, which
 do not quote them. The README table keeps each cell's Et, Gt, alpha, excess
 and cracked pair on one row. The preprint and the methods log state the
-anchor spans and the depth written in alpha_star.py. Does not call OpenSees
+anchor spans and the depth written in alpha_star.py. That file and the
+documents state the ShellBench anchor, C40, E = 32.5 GPa and 600 mm columns.
+Does not call OpenSees
 and does not write the file.
 """
 from __future__ import annotations
@@ -122,6 +124,12 @@ def main():
             problems.append("decisions no longer states the anchor spans and the depth")
         if f"The anchor spans are {prose} m, and the depth is {depth} m." not in preprint:
             problems.append("preprint no longer states the anchor spans and the depth")
+    if "C40, E = 32.5 GPa, 600 mm columns" not in source:
+        problems.append("alpha_star.py no longer states the ShellBench anchor")
+    if "C40, E = 32.5 GPa, 600 mm columns" not in decisions:
+        problems.append("decisions no longer states the ShellBench anchor")
+    if "C40 with E = 32.5 GPa and 600 mm columns" not in preprint:
+        problems.append("preprint no longer states the ShellBench anchor")
 
     if problems:
         print("\n".join(problems))
