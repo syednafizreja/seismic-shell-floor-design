@@ -6,11 +6,14 @@ those files, and does not read the floor page.
 
 The printed buckling factor is a rounding of the first factor in brackets.
 The number of decimals is the one in the print, so 2789 stands for 2789.003.
+Gravity prints a thickness to hundredths. vault_rib.txt prints the same
+thickness to tenths. Both stay as printed.
 """
 from __future__ import annotations
 
 import re
 import sys
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +32,7 @@ GATE = re.compile(
     r"Crown element 221, faces ([+-]?\d+\.\d+e[+-]\d+) Pa and ([+-]?\d+\.\d+e[+-]\d+) Pa")
 STIFF = re.compile(r"Et/\(E T\) (\d+\.\d+)\s+Gt/\(G T\) (\d+\.\d+)")
 RIB = re.compile(r"Rib thickness (\d+\.\d+) mm")
+SHELL = re.compile(r"thickness shell (\d+\.\d+) mm, rib (\d+\.\d+) mm")
 
 
 def between(text, start, end):
@@ -129,6 +133,23 @@ def main():
         return 1
     if "from the existing stress print" not in smooth30 or "two faces" in smooth30:
         problems.append("the rise 0.30 m smooth row is no longer the buckle-only print")
+    rib_lines = (EOUT / "vault_rib.txt").read_text(encoding="utf-8").splitlines()
+    for section, heading in (
+        (flat, "smooth rise 0.00 equal V"),
+        (smooth, "smooth rise 0.60 equal V"),
+        (cross, "cross rise 0.60 equal V"),
+        (smooth30, "smooth rise 0.30 equal V"),
+        (cross30, "cross rise 0.30 equal V"),
+    ):
+        thick = SHELL.search(section)
+        line = next((item for item in rib_lines if item.startswith(heading)), "")
+        if not thick or not line:
+            problems.append(f"{heading} has no thickness pair to compare")
+            continue
+        for raw in thick.groups():
+            tenth = Decimal(raw).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+            if str(tenth) not in line.split():
+                problems.append(f"{heading} does not round {raw} mm to {tenth} mm")
 
     records = [
         ("flat", row_from(flat, "flat", problems), True, None),
