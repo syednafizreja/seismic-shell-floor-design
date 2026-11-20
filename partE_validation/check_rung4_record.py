@@ -5,7 +5,8 @@ file. The 1 m panel stays with its printed error and the 0.5 m panel stays
 with its own. The seven layout errors stay in the file order. A PASS mark has to sit
 inside the printed 5 % limit, and only the rise 0.30 m cross has one.
 The beam prints state q = 1e+04 N/m. The preprint and the methods log
-state k = 5/6. Does not call CalculiX and does not write them.
+state k = 5/6. The hero alt states the five recorded ratios in that order.
+Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -237,6 +238,15 @@ def check_hero():
         for key in ("mesh", "t_shell_mm", "t_rib_mm", "area_plan", "Et", "Gt"):
             if row[key] not in tokens:
                 problems.append(f"{row['case']} {key} {row[key]} is not in vault_rib.txt")
+    if len(rows) == 5:
+        extension = (
+            f"flat {rows[0]['Et']}, smooth rise 0.30 m {rows[1]['Et']}, "
+            f"cross {rows[2]['Et']}, smooth rise 0.60 m {rows[3]['Et']}, cross {rows[4]['Et']}"
+        )
+        shear = ", ".join(row["Gt"] for row in rows)
+        readme = (root / "README.md").read_text(encoding="utf-8")
+        if extension not in readme or f"Shear ratio: {shear}." not in readme:
+            problems.append("the hero alt no longer states the recorded ratios")
     return problems
 
 
