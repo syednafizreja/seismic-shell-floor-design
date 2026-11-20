@@ -4,7 +4,8 @@ Reads rung 1, rung 2, the rung-4 files, the w-lock print and the X-strut
 file. The 1 m panel stays with its printed error and the 0.5 m panel stays
 with its own. The seven layout errors stay in the file order. A PASS mark has to sit
 inside the printed 5 % limit, and only the rise 0.30 m cross has one.
-Does not call CalculiX and does not write them.
+The beam prints state q = 1e+04 N/m. The preprint and the methods log
+state k = 5/6. Does not call CalculiX and does not write them.
 """
 from __future__ import annotations
 
@@ -339,6 +340,20 @@ def main():
     k_shear = re.search(r"k = (\d+\.\d+)", wlock)
     if not k_shear or abs(float(k_shear.group(1)) - 5.0 / 6.0) > 1e-6:
         problems.append("the w-lock print does not use k = 5/6")
+    load = "q = 1e+04 N/m"
+    for name in (
+        "rung2_deep_beam.txt",
+        "rung4_storey.txt",
+        "rung4_cross.txt",
+        "rung4_layouts.txt",
+        "rung4_wlock.txt",
+        "xstrut_check.txt",
+    ):
+        if load not in (OUT / name).read_text(encoding="utf-8"):
+            problems.append(f"{name} no longer states q = 1e+04 N/m")
+    _, preprint, decisions_text = docs()
+    if "k = 5/6" not in preprint or "k = 5/6" not in decisions_text:
+        problems.append("a document no longer states k = 5/6")
     if problems:
         print("\n".join(problems))
         return 1
