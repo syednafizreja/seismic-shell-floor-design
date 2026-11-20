@@ -93,7 +93,7 @@ def membrane_tensors(xyz, els):
         tensors[k] = full[:2, :2]
     rows = [acc[crown + 1][i] for i in range(1, 9)]
     faces = (float(np.mean(rows[:4], axis=0)[0]), float(np.mean(rows[4:], axis=0)[0]))
-    if max(abs(faces[0] - CROWN_SXX[0]), abs(faces[1] - CROWN_SXX[1])) > 1.0:
+    if CROWN_SXX is not None and max(abs(faces[0] - CROWN_SXX[0]), abs(faces[1] - CROWN_SXX[1])) > 1.0:
         raise RuntimeError(f"crown faces {faces} do not match gravity_bay.txt")
     return xy, tensors, suffix, crown + 1, faces
 

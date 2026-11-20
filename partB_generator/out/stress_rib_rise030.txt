@@ -1,0 +1,17 @@
+Rise 0.30 m at the recorded 0.375 m spacing. This file does not replace stress_rib.txt.
+Principal-stress ribs on the sine bay. Linear S8R. Not the recorded cross.
+Bay 3.0 m, rise 0.3 m, mesh 21x21. Shell 50 mm.
+Solver This is Version 2.23.
+Field: gravity membrane stress of the smooth equal-volume bay.
+Print suffix _shell_0000000001. Crown element 221, faces -5.014637e+04 Pa and -2.806953e+04 Pa.
+Square-symmetry gap 2.248 Pa.
+Line spacing 0.375 m. Edge clearance 0.125 m. Lines 32. Plan length 42.462 m.
+Rib elements 232. Rib thickness 66.29 mm. area/plan 1.0243.
+Author to confirm the gravity field, the shell axes, the scaled spacing and the half-pitch width.
+No knockdown is applied.
+Et/(E T) 0.46328   Gt/(G T) 0.64944
+crown w -0.0067 mm, largest |w| 0.0115 mm
+lowest positive buckling factor on self-weight 2405.68  factors [2405.675, 2760.783, 3401.762, 3678.407]
+crown sxx, two faces -5.470485e+04 Pa and -2.852846e+04 Pa. Negative is compression.
+H1 stays open. One stress-line layout is not the ribbed floor.
+Smooth shell in the same print: crown w -0.006964 mm, largest |w| 0.011468 mm.
