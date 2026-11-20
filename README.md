@@ -21,11 +21,11 @@ In-plane stiffness of one vault bay, the diaphragm ratio of that stiffness on th
 
 | Hypothesis | Verdict | Key numbers |
 |---|---|---|
-| H1. Flat-plate in-plane stiffness is an upper bound for the curved, ribbed floor of equal volume | Open. The smooth shell, the cross, the diagonals and the stress-line layout are below the flat plate. The cross is below the smooth shell. None of these layouts closes H1 | Rise 0.60 m, 21×21: smooth 0.40763 and 0.46892; cross 0.38984 and 0.45189; diagonals 0.39834 and 0.47168; stress lines 0.40744 and 0.46840 |
+| H1. Flat-plate in-plane stiffness is an upper bound for the curved, ribbed floor of equal volume | Open. The smooth shell, the cross, the diagonals and both stress-line spacings are below the flat plate. The cross is below the smooth shell. None of these layouts closes H1 | Rise 0.60 m, 21×21: smooth 0.40763 and 0.46892; cross 0.38984 and 0.45189; diagonals 0.39834 and 0.47168; stress lines 0.375 m, 0.40744 and 0.46840; stress lines 0.75 m, 0.41394 and 0.46365 |
 
 | Recorded | Not in this record |
 |---|---|
-| Rungs 1 and 2. Smooth bay. One rib cross. Two diagonals. Principal-stress ribs at 0.375 m. A joint strip. Timoshenko K_d for the flat plate. alpha* on the anchor frame. Gravity on the 3 m bay | The X-strut within 5 %, the building loop, NSGA-II |
+| Rungs 1 and 2. Smooth bay. One rib cross. Two diagonals. Principal-stress ribs at 0.375 m and 0.75 m. A joint strip. Timoshenko K_d for the flat plate. alpha* on the anchor frame. Gravity on the 3 m bay | The X-strut within 5 %, the building loop, NSGA-II |
 
 The figure is the equal-volume comparison, Et/(E T) and Gt/(G T), with T = 60 mm. [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt). Plotted values: [docs/img/hero.json](docs/img/hero.json).
 
@@ -42,7 +42,7 @@ At rise 0.60 m the cross is 0.95637 of the smooth shell in extension and 0.96369
 
 Two diagonals on the same rise and the same volume, shell 50 mm, rib 104.77 mm, 41 elements: Et/(E T) 0.39834 and Gt/(G T) 0.47168. [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt). The generator reproduces the recorded smooth shell and the cross to 2.91e-06. [partB_generator/out/reproduce_bay.txt](partB_generator/out/reproduce_bay.txt). *Author to confirm the diagonals.*
 
-Principal-stress ribs follow both families of the gravity membrane stress on that smooth bay. The spacing is 0.375 m. The strip is half an element pitch. 24 lines cover 236 of 441 elements, and the rib is 59.16 mm on a 50 mm shell. Et/(E T) 0.40744 and Gt/(G T) 0.46840, which are 0.00019 and 0.00052 below the smooth shell. [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt). *Author to confirm the field, the axes and the spacing.*
+Principal-stress ribs follow both families of the gravity membrane stress on that smooth bay. The spacing is 0.375 m. The strip is half an element pitch. 24 lines cover 236 of 441 elements, and the rib is 59.16 mm on a 50 mm shell. Et/(E T) 0.40744 and Gt/(G T) 0.46840, which are 0.00019 and 0.00052 below the smooth shell. [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt). Doubling the spacing to 0.75 m leaves 12 lines, 128 elements and a rib of 66.65 mm. Et/(E T) 0.41394 is 0.00631 above the smooth shell, and Gt/(G T) 0.46365 is 0.00527 below it. [partB_generator/out/stress_rib_075.txt](partB_generator/out/stress_rib_075.txt). Both spacings stay under the flat plate. *Author to confirm the field, the axes and the spacings.*
 
 The earlier mesh table uses another ratio. Et/(E t) there divides by the thickness in the row, not by 60 mm. For the 16×16 equal-volume row at rise 0.60 m, 0.44562 / 1.0930 = 0.40770, beside 0.40763 on the 21×21 mesh. [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt).
 
@@ -112,9 +112,10 @@ K_f of the ground storey, beam inertia factor 2.0, is 1.174970×10⁸ N/m. Two f
 | Smooth, rise 0.60 m | −0.0022 | 4933.37 | −1.941393×10⁴ and −1.684599×10⁴ |
 | Cross, rise 0.60 m | −0.0024 | 5210.6 | −1.867630×10⁴ and −1.325382×10⁴ |
 | Diagonals, rise 0.60 m | −0.0028 | 4272.83 | −1.478991×10⁴ and −1.460445×10⁴ |
-| Stress lines, rise 0.60 m | −0.0022 | 5012.74 | −2.022574×10⁴ and −1.691824×10⁴ |
+| Stress lines, 0.375 m | −0.0022 | 5012.74 | −2.022574×10⁴ and −1.691824×10⁴ |
+| Stress lines, 0.75 m | −0.0022 | 5383.24 | −1.962041×10⁴ and −1.705144×10⁴ |
 
-The first three rows are [partE_validation/out/gravity_bay.txt](partE_validation/out/gravity_bay.txt). The diagonal row is [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt). The stress-line row is [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt). Rotations on the boundary are free. Density 2500 kg/m³. No knockdown. *Author to confirm the support and the density.*
+The first three rows are [partE_validation/out/gravity_bay.txt](partE_validation/out/gravity_bay.txt). The diagonal row is [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt). The stress-line rows are [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt) and [stress_rib_075.txt](partB_generator/out/stress_rib_075.txt). Rotations on the boundary are free. Density 2500 kg/m³. No knockdown. *Author to confirm the support and the density.*
 
 | Joint factor 0.1, flat 60 mm | Strip width | Et / continuous |
 |---|---:|---:|
@@ -222,7 +223,7 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | The smooth-bay mesh record | [partE_validation/out/vault_bay.txt](partE_validation/out/vault_bay.txt) |
 | The rib cross | [partE_validation/out/vault_rib.txt](partE_validation/out/vault_rib.txt) |
 | Two diagonals, and the generator check | [partB_generator/out/diagonal_bay.txt](partB_generator/out/diagonal_bay.txt), [reproduce_bay.txt](partB_generator/out/reproduce_bay.txt) |
-| Principal-stress ribs | [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt) |
+| Principal-stress ribs | [partB_generator/out/stress_rib.txt](partB_generator/out/stress_rib.txt), [stress_rib_075.txt](partB_generator/out/stress_rib_075.txt) |
 | alpha*, the joint strip, gravity | [partE_validation/out/alpha_star.txt](partE_validation/out/alpha_star.txt), [joint_stiffness.txt](partE_validation/out/joint_stiffness.txt), [gravity_bay.txt](partE_validation/out/gravity_bay.txt) |
 | Preprint v1 | [docs/preprint_v1.md](docs/preprint_v1.md) |
 | The solver | [partA_mechanics/plate_fe.py](partA_mechanics/plate_fe.py), [reduced.py](partA_mechanics/reduced.py) |
@@ -231,7 +232,7 @@ Rungs 3 and 5 already exist in ShellBench. They are rerun when Part C is wired. 
 | Folder | Brief part | State |
 |---|---|---|
 | `partA_mechanics/` | Unit cell, vault bay, reduced diaphragm | Solver, Timoshenko K_d, X-strut grid |
-| `partB_generator/` | Floor generator | Reproduces the recorded bay. Diagonals and one stress-line layout are in the record |
+| `partB_generator/` | Floor generator | Reproduces the recorded bay. Diagonals and stress-line ribs at 0.375 m and 0.75 m are in the record |
 | `partC_building/` | Whole building | Not started |
 | `partD_optimise/` | NSGA-II | Not started. The brief forbids it before the rungs pass |
 | `partE_validation/` | Rungs 1–8 | Rungs 1, 2 and the deflection half of 4. Joint strip, gravity, alpha* |
