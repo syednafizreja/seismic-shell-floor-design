@@ -158,7 +158,7 @@ PYTHONPATH=. python partE_validation/gravity_bay.py
 PYTHONPATH=. python partE_validation/alpha_star.py
 ```
 
-`alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above. `check_alpha_record.py` recomputes alpha and alpha* from that printed K_f, and it checks the six cell ratios against `vault_rib.txt`. It does not call OpenSees and it does not write the file. `check_tension_record.py` reads the nine compression prints and checks that the README names each tensile count and each largest principal. It does not write those files.
+`alpha_star.py` imports the ShellBench anchor frame and OpenSees. The number it prints for K_f is the one in the table above. `check_alpha_record.py` recomputes alpha and alpha* from that printed K_f, and it checks the six cell ratios against `vault_rib.txt`. It does not call OpenSees and it does not write the file. `check_tension_record.py` reads the nine compression prints and checks that the README names each tensile count and each largest principal. It does not write those files. `check_joint_record.py` reads `joint_stiffness.txt`. It checks that Et/cont and Gt/cont are that row divided by the factor-1 row, and that the README, the preprint and the methods log name the printed flat factor-0.1 ratios. It does not call CalculiX and it does not write the file.
 
 `rung4_layouts.py` reads `partB_generator/out/smooth_gravity_stress.dat` and `smooth_gravity_stress_030.dat` for the stress-line rows. Those files are the gravity prints. The script does not rewrite them. The commands above rewrite their result files. The copies in this repository are the record.
 
@@ -166,6 +166,7 @@ PYTHONPATH=. python partE_validation/alpha_star.py
 PYTHONPATH=. python partE_validation/check_rung4_record.py
 PYTHONPATH=. python partE_validation/check_alpha_record.py
 PYTHONPATH=. python partE_validation/check_tension_record.py
+PYTHONPATH=. python partE_validation/check_joint_record.py
 ```
 
 `check_rung4_record.py` reads `rung1_unit_cell.txt`, `rung2_deep_beam.txt`, `rung4_layouts.txt`, `rung4_cross.txt`, `rung4_storey.txt`, `xstrut_check.txt` and `docs/img/hero.json`. It recomputes the exact flat stiffness, the rung-2 Timoshenko column, the rung-4 Timoshenko column, and the two X-strut percentages. It checks the five hero rows against `vault_rib.txt`. It does not call CalculiX and it does not write those files.
