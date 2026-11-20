@@ -180,7 +180,7 @@ PYTHONPATH=. python partE_validation/check_suite.py
 
 `check_stress_field.py` reads `smooth_gravity_stress.dat` and `smooth_gravity_stress_030.dat`. Element 221, points 1 to 4, matches one crown face in the stress-line file, and points 5 to 8 match the other. The 0.75 m print names the same rise 0.60 m gate. The two in-plane stresses on each point agree. It does not call CalculiX and it does not write those files.
 
-`check_suite.py` runs those printed-record checks. The README names each one. It does not call CalculiX or OpenSees and it does not write the prints.
+`check_suite.py` runs those printed-record checks. The README names each one. The 76 relative links in the Markdown files resolve inside this repository. It does not call CalculiX or OpenSees and it does not write the prints.
 
 **3. Figures**
 
