@@ -235,10 +235,24 @@ def main():
         if f"worst |error| {worst_abs:.2f} %  ->  FAIL (limit 5 %)" not in wlock:
             problems.append("the w-lock worst line is not a fail at the larger printed error")
         _, _, decisions = docs()
+        shares = {
+            match.group(1): match.group(2)
+            for line in wlock.splitlines()
+            if (match := re.search(r"([+-]\d+\.\d+)\s+%\s+(\d+\.\d+)\s*$", line))
+        }
         for row in locked:
             for token in (row["err"].lstrip("+-"), row["fe"], row["timo"]):
                 if token not in decisions:
                     problems.append(f"decisions has no w-lock {token}")
+            printed = shares.get(row["err"])
+            et = float(row["et"]) * E * T
+            gt = float(row["gt"]) * G * T
+            formula = timoshenko_midspan(LX, LY, et, gt, Q)
+            bend = 5.0 * Q * LX ** 4 / (384.0 * et * LY ** 3 / 12.0)
+            if printed is None or abs(bend / formula - float(printed)) > 5e-4:
+                problems.append(f"w-lock bend share {printed} is not the bending term")
+            elif printed not in decisions:
+                problems.append(f"decisions has no w-lock bend share {printed}")
     k_shear = re.search(r"k = (\d+\.\d+)", wlock)
     if not k_shear or abs(float(k_shear.group(1)) - 5.0 / 6.0) > 1e-6:
         problems.append("the w-lock print does not use k = 5/6")
