@@ -73,7 +73,7 @@ A joint is a centreline strip whose modulus is the factor times E. Factor 1 is t
 | Rung 1, flat cell | PASS. Worst error 1.62×10⁻⁶ %, limit 1 % |
 | Rung 2, deep beam | PASS. Worst error 0.21 %, limit 2 % |
 | Rise zero on the smooth bay | PASS. Et 1.684×10⁻⁶ %, Gt 1.155×10⁻¹² %, limit 0.1 % |
-| Rung 4, 3 m deep beam against its own Et, Gt | Flat −2.93 %, inside 5 %. Rise 0.60 m on 12×12 +15.80 %, outside 5 %. On the recorded 21×21 mesh the smooth shell is +15.33 % and the cross is +31.53 %. Both outside 5 % |
+| Rung 4, 3 m deep beam against its own Et, Gt | Flat −2.93 %, inside 5 %. Rise 0.60 m on 12×12 +15.80 %, outside 5 %. On the recorded 21×21 mesh the smooth shell is +15.33 % and the cross is +31.53 %. Both outside 5 %. On the other recorded layouts, rise 0.30 m smooth −11.99 %, rise 0.30 m cross +1.29 %, diagonals +12.49 % and −9.38 %, stress lines +11.30 %, +8.58 % and −13.72 %. Only the rise 0.30 m cross is inside 5 % |
 | X-strut grid, calibrated on Et and Gt, checked on the deep beam | 1 m panel +9.83 %. 0.5 m panel +12.74 %. Both outside 5 % |
 
 The 5 % figure is the brief's rung-4 limit. It is not a code clause. The Timoshenko reduction passes for the flat plate and does not pass for this vault. The X-strut does not pass for the flat plate either, and a finer panel does not close the gap.
