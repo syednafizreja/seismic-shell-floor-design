@@ -6,7 +6,8 @@ do not quote them. The README table keeps each cell's Et, Gt, alpha, excess
 and cracked pair on one row. The preprint and the methods log state the
 anchor spans and the depth written in alpha_star.py. That file and the
 documents state the ShellBench anchor, C40, E = 32.5 GPa and 600 mm columns.
-Does not call OpenSees
+The print, the preprint and the methods log name BS EN 1998-1:2004, PDF page 55,
+printed page 53. Does not call OpenSees
 and does not write the file.
 """
 from __future__ import annotations
@@ -130,6 +131,10 @@ def main():
         problems.append("decisions no longer states the ShellBench anchor")
     if "C40 with E = 32.5 GPa and 600 mm columns" not in preprint:
         problems.append("preprint no longer states the ShellBench anchor")
+    copy = "BS EN 1998-1:2004, PDF page 55, printed page 53"
+    for name, body in (("alpha_star.txt", text), ("preprint", preprint), ("decisions", decisions)):
+        if copy not in body:
+            problems.append(f"{name} no longer names {copy}")
 
     if problems:
         print("\n".join(problems))
