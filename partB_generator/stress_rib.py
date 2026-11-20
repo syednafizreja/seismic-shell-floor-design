@@ -9,12 +9,10 @@ element pitch of a traced line.
 
 Author to confirm the field, the shell axes, the scaled spacing and the width.
 """
-import sys
 from pathlib import Path
 
 import numpy as np
 
-sys.path.append(r"C:\Users\ASUS\ComputationalEngineering\P2_ribs_vs_thickness\src")
 from cecore.env import ccx_version
 from cecore.tracer import trace_lines
 
